@@ -1,10 +1,10 @@
 <Project>
 
+  <!-- This repository's own projects use Microsoft.NET.Sdk directly, so import the Sdk content, not the wrapper -->
   <PropertyGroup>
-    <UseArtifactsOutput>true</UseArtifactsOutput>
-    <ArtifactsPath>$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), .gitignore))/artifacts</ArtifactsPath>
+    <_BottlenoseLabsSdkDirectoryPath>$(MSBuildThisFileDirectory)production/Sdk</_BottlenoseLabsSdkDirectoryPath>
+    <_BottlenoseLabsSdkContentDirectoryPath>$(_BottlenoseLabsSdkDirectoryPath)</_BottlenoseLabsSdkContentDirectoryPath>
   </PropertyGroup>
-
-  <Import Project="$(MSBuildThisFileDirectory)production/MSBuild.Extensions/bottlenoselabs.MSBuild.Extensions.props" />
+  <Import Project="$(_BottlenoseLabsSdkContentDirectoryPath)/Sdk.props" />
 
 </Project>

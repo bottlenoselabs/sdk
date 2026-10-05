@@ -18,7 +18,7 @@ indent_style = tab
 indent_size = 2
 
 # XML Configuration Files
-[*.{xml,config,props,targets,nuspec,resx,ruleset,vsixmanifest,vsct}]
+[*.{slnx,xml,config,props,targets,nuspec,resx,ruleset,vsixmanifest,vsct}]
 indent_size = 2
 
 # JSON Files
@@ -48,3 +48,8 @@ end_of_line = lf
 # Makefiles
 [Makefile]
 indent_style = tab
+
+# C# Files
+[*.cs]
+insert_final_newline = true
+# Analyzer and code style rules are in `CodeAnalysis/BottlenoseLabs.globalconfig`

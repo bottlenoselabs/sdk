@@ -12,7 +12,7 @@
     <_IsPackageIconSet>true</_IsPackageIconSet>
   </PropertyGroup>
   <ItemGroup Condition=" '$(_IsPackageIconSet)' != '' ">
-    <Content Include="$(_MSBuildExtensionsDirectoryPath)/icon.png">
+    <Content Include="$(_BottlenoseLabsSdkDirectoryPath)/icon.png">
       <Pack>true</Pack>
       <PackagePath>icon.png</PackagePath>
       <Link>Properties/bottlenoselabs/icon.png</Link>

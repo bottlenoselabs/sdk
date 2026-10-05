@@ -1,5 +1,0 @@
-<Project>
-
-    <Import Project="$(_MSBuildExtensionsContentDirectoryPath)/MSBuild.Extensions.targets" />
-
-</Project>

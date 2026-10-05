@@ -1,0 +1,15 @@
+<Project>
+
+  <PropertyGroup>
+    <_BottlenoseLabsSdkDirectoryPath Condition="Exists('$(MSBuildThisFileDirectory)../Sdk.props')">$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..'))</_BottlenoseLabsSdkDirectoryPath>
+    <_BottlenoseLabsSdkDirectoryPath Condition="Exists('$(MSBuildThisFileDirectory)../content/Sdk.props')">$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..'))</_BottlenoseLabsSdkDirectoryPath>
+    <_BottlenoseLabsSdkContentDirectoryPath Condition="Exists('$(MSBuildThisFileDirectory)../Sdk.props')">$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..'))</_BottlenoseLabsSdkContentDirectoryPath>
+    <_BottlenoseLabsSdkContentDirectoryPath Condition="Exists('$(MSBuildThisFileDirectory)../content/Sdk.props')">$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../content'))</_BottlenoseLabsSdkContentDirectoryPath>
+  </PropertyGroup>
+
+  <Import Project="$(_BottlenoseLabsSdkContentDirectoryPath)/Sdk.props" />
+
+  <!-- Wrapped Sdk: our props come first, then Microsoft.NET.Sdk -->
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+
+</Project>
