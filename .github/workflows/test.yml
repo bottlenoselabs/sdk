@@ -1,13 +1,17 @@
-name: "Test .NET solution"
+name: "Test SDK"
 
 on:
   workflow_call:
 
+permissions:
+  contents: read
+
 jobs:
 
-  test-dotnet-job:
-    name: "Test .NET solution: ${{ matrix.platform.name }}"
+  test-sdk-job:
+    name: "Test SDK: ${{ matrix.platform.name }}"
     runs-on: ${{ matrix.platform.os }}
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
@@ -21,21 +25,15 @@ jobs:
     steps:
 
     - name: "Clone Git repository"
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: "Setup .NET"
-      uses: actions/setup-dotnet@v3
+      uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '8.x'
+        global-json-file: global.json
 
-    - name: "Test .NET solution"
-      run: |
-        dotnet test '${{ github.workspace }}/src/cs' --nologo --verbosity minimal --configuration Release
+    - name: "Build the SDK"
+      run: dotnet build "./src/cs" --nologo --verbosity minimal --configuration Release
 
-    - name: "Collect generated test files"
-      uses: actions/upload-artifact@v3
-      if: github.event_name == 'pull_request'
-      with:
-        name: "Test Data ${{ matrix.platform.name }}"
-        path: |
-          ${{ github.workspace }}/src/cs/tests/*.Tests/Data/Values/**/*.json
+    - name: "Pack the SDK and build a consumer project against it"
+      run: ./src/cs/tests/Consumer/test.sh

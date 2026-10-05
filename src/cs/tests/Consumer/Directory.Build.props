@@ -1,0 +1,8 @@
+<Project>
+
+  <!-- Intentionally does not import the repository's src/cs props, so only the NuGet package is under test -->
+  <PropertyGroup>
+    <ArtifactsPath>$(MSBuildThisFileDirectory)artifacts</ArtifactsPath>
+  </PropertyGroup>
+
+</Project>

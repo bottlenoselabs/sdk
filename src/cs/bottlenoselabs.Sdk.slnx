@@ -1,0 +1,5 @@
+<Solution>
+  <Folder Name="/production/">
+    <Project Path="production/Sdk/Sdk.csproj" />
+  </Folder>
+</Solution>

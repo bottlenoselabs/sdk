@@ -9,3 +9,8 @@
 
 # JetBrains
 .idea/
+
+# Consumer test project
+/src/cs/tests/Consumer/.packages
+/src/cs/tests/Consumer/artifacts
+/src/cs/tests/Consumer/obj

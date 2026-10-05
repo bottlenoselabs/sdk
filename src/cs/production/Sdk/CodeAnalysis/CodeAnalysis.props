@@ -3,7 +3,6 @@
   <!-- Custom settings -->
   <PropertyGroup>
     <IsEnabledAnalyzers Condition=" '$(IsEnabledAnalyzers)' == '' ">true</IsEnabledAnalyzers>
-    <IsEnabledCodeAnalysisSuppressions Condition=" '$(IsEnabledCodeAnalysisSuppressions)' == '' ">true</IsEnabledCodeAnalysisSuppressions>
   </PropertyGroup>
 
   <!-- MSBuild settings -->
@@ -17,7 +16,9 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
-  <!-- StyleCop -->
-  <Import Project="$(MSBuildThisFileDirectory)StyleCop/StyleCop.props" />
+  <!-- Analyzer and code style rules -->
+  <ItemGroup Condition=" '$(IsEnabledAnalyzers)' == 'true' ">
+    <GlobalAnalyzerConfigFiles Include="$(MSBuildThisFileDirectory)BottlenoseLabs.globalconfig" Link="Properties/BottlenoseLabs.globalconfig" />
+  </ItemGroup>
 
 </Project>

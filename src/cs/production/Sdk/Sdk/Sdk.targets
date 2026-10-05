@@ -1,0 +1,8 @@
+<Project>
+
+  <!-- Wrapped Sdk: Microsoft.NET.Sdk first, then our targets come last -->
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+
+  <Import Project="$(_BottlenoseLabsSdkContentDirectoryPath)/Sdk.targets" />
+
+</Project>

@@ -19,9 +19,6 @@
         <None Condition="Exists('$(DotSettingsFilePath)')" Include="$(DotSettingsFilePath)" Link="Properties/$(DotSettingsFilePath)" />
     </ItemGroup>
 
-    <!-- Code analysis -->
-    <Import Project="$(MSBuildThisFileDirectory)/CodeAnalysis/CodeAnalysis.targets" />
-
     <!-- NuGet -->
     <Import Project="$(MSBuildThisFileDirectory)/NuGet/NuGet.targets" />
 

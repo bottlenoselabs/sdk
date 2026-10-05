@@ -1,0 +1,5 @@
+{
+  "msbuild-sdks": {
+    "bottlenoselabs.Sdk": "0.0.0-pre"
+  }
+}

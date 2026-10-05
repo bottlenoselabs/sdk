@@ -1,5 +1,5 @@
 <Project>
 
-    <Import Project="$(MSBuildThisFileDirectory)production/MSBuild.Extensions/bottlenoselabs.MSBuild.Extensions.targets" />
+    <Import Project="$(MSBuildThisFileDirectory)production/Sdk/Sdk.targets" />
 
 </Project>

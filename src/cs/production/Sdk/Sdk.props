@@ -5,6 +5,13 @@
     <GitRepositoryPath>$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), .gitignore))</GitRepositoryPath>
   </PropertyGroup>
 
+  <!-- Output: all projects build to <git repository>/artifacts (or next to the project when not in a git repository) -->
+  <PropertyGroup>
+    <UseArtifactsOutput>true</UseArtifactsOutput>
+    <ArtifactsPath Condition=" '$(GitRepositoryPath)' != '' ">$(GitRepositoryPath)/artifacts</ArtifactsPath>
+    <ArtifactsPath Condition=" '$(GitRepositoryPath)' == '' ">$(MSBuildProjectDirectory)/artifacts</ArtifactsPath>
+  </PropertyGroup>
+
   <!-- MSBuild project settings -->
   <PropertyGroup>
     <Company>bottlenoselabs</Company>
@@ -13,6 +20,7 @@
     <NeutralLanguage>en</NeutralLanguage>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
@@ -51,11 +59,11 @@
 
   <!-- Content include all files + compile all .cs files -->
   <ItemGroup>
-    <Content Include="$(_MSBuildExtensionsContentDirectoryPath)/**/*.*">
+    <Content Include="$(_BottlenoseLabsSdkContentDirectoryPath)/**/*.*">
       <Pack>false</Pack>
       <Link>Properties/bottlenoselabs/$(MSBuildThisFileName)/%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Content>
-    <Compile Include="$(_MSBuildExtensionsContentDirectoryPath)/**/*.cs" >
+    <Compile Include="$(_BottlenoseLabsSdkContentDirectoryPath)/**/*.cs" >
       <Link>Properties/bottlenoselabs/$(MSBuildThisFileName)/%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
   </ItemGroup>

@@ -3,17 +3,13 @@
   <!-- MSBuild project settings -->
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <RootNamespace>bottlenoselabs.MSBuild.Extensions</RootNamespace>
+    <RootNamespace>bottlenoselabs.Sdk</RootNamespace>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
   </PropertyGroup>
 
   <!-- Custom project settings -->
   <PropertyGroup>
     <IsEnabledAnalyzers>true</IsEnabledAnalyzers>
-    <IsEnabledAnalyzersStyleCop>true</IsEnabledAnalyzersStyleCop>
-    <IsEnabledCodeAnalysisSuppressions>false</IsEnabledCodeAnalysisSuppressions>
     <IsEnabledCLSCompliant>false</IsEnabledCLSCompliant>
   </PropertyGroup>
 
@@ -28,12 +24,13 @@
     <CopyBuildOutputToOutputDirectory>true</CopyBuildOutputToOutputDirectory>
     <CopyOutputSymbolsToOutputDirectory>true</CopyOutputSymbolsToOutputDirectory>
     <DevelopmentDependency>true</DevelopmentDependency>
+    <PackageType>MSBuildSdk</PackageType>
   </PropertyGroup>
 
   <!-- Common.Tools.props will include compile files, but then they will get compiled twice for this .csproj -->
   <ItemGroup>
-    <Compile Remove="$(_MSBuildExtensionsContentDirectoryPath)/**/*.cs" />
-    <None Include="$(_MSBuildExtensionsContentDirectoryPath)/**/*.cs" />
+    <Compile Remove="$(_BottlenoseLabsSdkContentDirectoryPath)/**/*.cs" />
+    <None Include="$(_BottlenoseLabsSdkContentDirectoryPath)/**/*.cs" />
   </ItemGroup>
 
   <!-- NuGet package content-->
@@ -42,18 +39,18 @@
       <Pack>true</Pack>
       <PackagePath>content/</PackagePath>
     </Content>
-    <Content Update="$(MSBuildThisFileDirectory)bottlenoselabs.MSBuild.Extensions.props">
-      <PackagePath>build/</PackagePath>
+    <Content Update="$(MSBuildThisFileDirectory)Sdk/Sdk.props">
+      <PackagePath>./</PackagePath>
       <PackageCopyToOutput>true</PackageCopyToOutput>
     </Content>
-    <Content Update="$(MSBuildThisFileDirectory)bottlenoselabs.MSBuild.Extensions.targets">
-      <PackagePath>build/</PackagePath>
+    <Content Update="$(MSBuildThisFileDirectory)Sdk/Sdk.targets">
+      <PackagePath>./</PackagePath>
       <PackageCopyToOutput>true</PackageCopyToOutput>
     </Content>
 
     <Content Remove="$(MSBuildThisFileDirectory)obj/**/*" />
     <Content Remove="$(MSBuildThisFileDirectory)bin/**/*" />
-    <Content Remove="$(MSBuildThisFileDirectory)MSBuild.Extensions.csproj" />
+    <Content Remove="$(MSBuildThisFileDirectory)Sdk.csproj" />
   </ItemGroup>
 
 </Project>
