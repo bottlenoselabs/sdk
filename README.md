@@ -62,13 +62,3 @@ To override an analyzer or code style rule, add it to an `.editorconfig` file in
 [*.cs]
 dotnet_diagnostic.IDE0055.severity = warning
 ```
-
-## Contributors
-
-The SDK lives in `src/cs/production/Sdk`.
-
-- `Sdk/Sdk.props` and `Sdk/Sdk.targets` are the SDK entry points that MSBuild loads.
-- `Sdk.props` and `Sdk.targets` hold the settings, and `CodeAnalysis/` and `NuGet/` hold their own `.props` and `.targets`.
-- The repository's own projects use `Microsoft.NET.Sdk` and import `Sdk.props` and `Sdk.targets` directly through `src/cs/Directory.Build.props` and `src/cs/Directory.Build.targets`.
-
-To check the package end to end, run `src/cs/tests/Consumer/test.sh`. It packs the SDK into a local `nupkg` folder and builds a consumer project against it.
