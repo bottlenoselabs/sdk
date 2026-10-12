@@ -1,6 +1,6 @@
 # bottlenoselabs.Sdk
 
-An MSBuild SDK with common settings for all C# projects at Bottlenose Labs. It wraps `Microsoft.NET.Sdk`: the SDK's `.props` are imported before the .NET SDK's and its `.targets` after, so a project only needs one `Sdk` attribute.
+A C# SDK with common stuff for all C# projects at Bottlenose Labs. 
 
 ## Developers: How to use
 
