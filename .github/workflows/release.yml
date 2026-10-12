@@ -30,7 +30,7 @@ jobs:
   release-job:
     name: "Release"
     needs: [test-job]
-    uses: "bottlenoselabs/.github/.github/workflows/release-nuget.yml@main"
+    uses: "bottlenoselabs/.github/.github/workflows/release-nuget.yml@5ccd4dd015843eb598fa9f6a5ea5703ce974f28b" # main
     permissions:
       contents: write
       id-token: write
