@@ -51,6 +51,5 @@
       "target": "Rgba32F"
     }
   ],
-  "isEnabledGeneratingRuntimeCode": true,
-  "isEnabledVerifyCSharpCodeCompiles": false
+  "isEnabledGeneratingRuntimeCode": true
 }
