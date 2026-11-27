@@ -10,7 +10,7 @@
 # JetBrains
 .idea/
 
-# Consumer test project
-/src/cs/tests/Consumers/.packages
-/src/cs/tests/Consumers/artifacts
-/src/cs/tests/Consumers/obj
+# Consumer test projects: packages restored from the local feed, and build output
+/src/cs/tests/**/.packages/
+/src/cs/tests/**/artifacts/
+/src/cs/tests/**/obj/

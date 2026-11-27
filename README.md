@@ -111,6 +111,7 @@ Other repositories can call these workflows instead of copying them. Pin to a re
 | Workflow | What it does |
 | --- | --- |
 | [`cs-build.yml`](.github/workflows/cs-build.yml) | Builds and tests on Windows, Linux and macOS (`runs-on`), then runs an optional `script` |
+| [`cs-game-publish.yml`](.github/workflows/cs-game-publish.yml) | Publishes a game with NativeAOT once per runtime identifier (default `win-x64`, `osx-arm64`, `linux-x64`) on a runner of that operating system, and uploads each build as a `.zip` (Windows) or `.tar.gz` artifact |
 | [`cs-release.yml`](.github/workflows/cs-release.yml) | From the default branch only: packs, pushes to NuGet.org with trusted publishing, and creates a tagged GitHub release |
 
 ```yaml
