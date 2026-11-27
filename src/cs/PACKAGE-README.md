@@ -30,7 +30,7 @@ Then use it in your project file:
 Or start a new repository from a template:
 
 ```bash
-dotnet new install bottlenoselabs.Templates::<version>
+dotnet new install bottlenoselabs.Templates@<version>
 dotnet new bl-game --name MyGame
 ```
 
