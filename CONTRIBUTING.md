@@ -7,9 +7,10 @@ Bugs and ideas go in [issues](https://github.com/bottlenoselabs/sdk/issues). For
 ## Layout
 
 ```text
-.github/workflows/
-  cs-build.yml, cs-game-publish.yml, cs-release.yml   Reusable workflows, for other repositories
-  main.yml, release.yml                                This repository's own CI, which calls the reusable workflows
+.github/
+  workflows/cs-build.yml, cs-game-publish.yml   Reusable workflows, for other repositories
+  actions/cs-release/                           The release action, for other repositories
+  workflows/main.yml, release.yml               This repository's own CI, which uses the reusable workflows and the action
 src/cs/
   production/
     Sdk/                 Shared settings for every SDK, and the bottlenoselabs.Sdk package
@@ -85,4 +86,4 @@ To lint workflows, use [actionlint](https://github.com/rhysd/actionlint).
 
 ## Releasing
 
-Releases are published to NuGet.org by the **Release** workflow, run by hand from the Actions tab on `main`. It packs the three SDKs and the templates with one version (by default today's date, for example `2026.11.27`), pushes them to NuGet.org, and creates a GitHub release with the tag `v<version>`. Other repositories pin the reusable workflows to that tag.
+Releases are published to NuGet.org by the **Release** workflow (`release.yml`), run by hand from the Actions tab on `main`. It uses NuGet trusted publishing; the policy on NuGet.org names `release.yml`. It packs the three SDKs and the templates with one version (by default today's date, for example `2026.11.27`), pushes them to NuGet.org, and creates a GitHub release with the tag `v<version>`. Other repositories pin the reusable workflows to that tag.

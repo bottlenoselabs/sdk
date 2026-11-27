@@ -55,3 +55,28 @@ jobs:
           ls -la game
           # The test game only prints a line, so it runs without a display; no FUSE on runners, so extract and run
           ./game/GameApp.AppImage --appimage-extract-and-run
+
+  release-dry-run-job:
+    name: "Release (dry run)"
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+
+      - name: "Clone Git repository"
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: "Pack with the release action, without pushing"
+        id: release
+        uses: "./.github/actions/cs-release"
+        with:
+          path: "./src/cs"
+          push: "false"
+
+      - name: "Check the packages"
+        shell: bash
+        env:
+          VERSION: ${{ steps.release.outputs.version }}
+        run: |
+          for id in bottlenoselabs.Sdk bottlenoselabs.Sdk.WebApp bottlenoselabs.Sdk.GameApp bottlenoselabs.Templates; do
+            test -f "./nupkg/$id.$VERSION.nupkg" || { echo "Missing ./nupkg/$id.$VERSION.nupkg" >&2; exit 1; }
+          done

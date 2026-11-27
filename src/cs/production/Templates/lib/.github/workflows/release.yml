@@ -34,13 +34,18 @@ jobs:
   release-job:
     name: "Release"
     needs: [build-job]
-    uses: "bottlenoselabs/sdk/.github/workflows/cs-release.yml@vBOTTLENOSELABS_SDK_VERSION"
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # The NuGet.org trusted publishing policy names this file, release.yml, because the job that logs in is here
     permissions:
-      contents: write
-      id-token: write
-    with:
-      path: "./src/cs"
-      pre-release: ${{ inputs.pre-release }}
-      version: ${{ inputs.version }}
-    secrets:
-      NUGET_USER: ${{ secrets.NUGET_USER }}
+      contents: write # Create the tag and GitHub release
+      id-token: write # NuGet trusted publishing (OIDC)
+    steps:
+
+      - name: "Release"
+        uses: "bottlenoselabs/sdk/.github/actions/cs-release@vBOTTLENOSELABS_SDK_VERSION"
+        with:
+          path: "./src/cs"
+          pre-release: ${{ inputs.pre-release }}
+          version: ${{ inputs.version }}
+          nuget-user: ${{ secrets.NUGET_USER }}

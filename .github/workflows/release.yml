@@ -34,13 +34,21 @@ jobs:
   release-job:
     name: "Release"
     needs: [build-job]
-    uses: "./.github/workflows/cs-release.yml"
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # The job is in this file, so the NuGet.org trusted publishing policy names `release.yml`
     permissions:
-      contents: write
-      id-token: write
-    with:
-      path: "./src/cs"
-      pre-release: ${{ inputs.pre-release }}
-      version: ${{ inputs.version }}
-    secrets:
-      NUGET_USER: ${{ secrets.NUGET_USER }}
+      contents: write # Create the tag and GitHub release
+      id-token: write # NuGet trusted publishing (OIDC)
+    steps:
+
+      - name: "Clone Git repository"
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: "Release"
+        uses: "./.github/actions/cs-release"
+        with:
+          path: "./src/cs"
+          pre-release: ${{ inputs.pre-release }}
+          version: ${{ inputs.version }}
+          nuget-user: ${{ secrets.NUGET_USER }}
