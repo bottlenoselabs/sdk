@@ -16,7 +16,7 @@ Change one line in your project file to get modern C# defaults, strict code anal
 | `bottlenoselabs.Templates` | `dotnet new` templates for new repositories | |
 
 > [!NOTE]
-> The first release to NuGet.org is coming soon. Until then, see [CONTRIBUTING.md](CONTRIBUTING.md#testing) to build the packages yourself.
+> The packages are in pre-release. Find the latest version on [Releases](https://github.com/bottlenoselabs/sdk/releases) and use it for `<version>` below: pre-release versions must be named explicitly.
 
 ## What you get
 
@@ -29,7 +29,7 @@ Change one line in your project file to get modern C# defaults, strict code anal
 ## Quick start
 
 ```bash
-dotnet new install bottlenoselabs.Templates::<version>
+dotnet new install bottlenoselabs.Templates@<version>
 dotnet new bl-game --name MyGame        # or bl-webapp, bl-lib
 cd MyGame
 git init

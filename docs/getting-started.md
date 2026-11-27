@@ -3,7 +3,7 @@
 This guide gets you from nothing to a running project on one of these SDKs. It assumes you know C# and the `dotnet` command line, but not MSBuild SDKs.
 
 > [!NOTE]
-> The packages are not on NuGet.org yet. Until the first release, replace `<version>` below with a version from [Releases](https://github.com/bottlenoselabs/sdk/releases), or build them yourself: see [CONTRIBUTING.md](../CONTRIBUTING.md#testing).
+> Replace `<version>` below with a version from [Releases](https://github.com/bottlenoselabs/sdk/releases). While the packages are in pre-release, the version must be named explicitly, for example `bottlenoselabs.Templates@2026.11.27-rc`.
 
 ## What you need
 
@@ -21,7 +21,7 @@ You can build and run in Debug without the linker; it is only needed for NativeA
 The quickest start. Each template creates a whole repository: the project, `global.json`, `.gitignore`, `.editorconfig`, a README, and GitHub Actions workflows.
 
 ```bash
-dotnet new install bottlenoselabs.Templates::<version>
+dotnet new install bottlenoselabs.Templates@<version>
 dotnet new bl-game --name MyGame
 cd MyGame
 git init
