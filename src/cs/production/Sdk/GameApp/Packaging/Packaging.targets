@@ -1,0 +1,55 @@
+<Project>
+
+  <!--
+    Imported by GameApp.targets, after the project file and Microsoft.NET.Sdk's targets.
+    Gives the game its icon and Windows manifest, and turns `dotnet publish` output into the platform's app format:
+      Windows: <name>.exe with the icon and app.manifest built in
+      macOS:   <name>.app
+      Linux:   <name>.AppDir (the cs-game-publish.yml workflow turns it into <name>.AppImage)
+  -->
+
+  <PropertyGroup>
+    <!-- Icon: icon.png next to the project file, or a neutral game controller icon. Any square size; 1024x1024 or larger looks best -->
+    <GameAppIcon Condition=" '$(GameAppIcon)' == '' AND Exists('$(MSBuildProjectDirectory)/icon.png') ">$(MSBuildProjectDirectory)/icon.png</GameAppIcon>
+    <GameAppIcon Condition=" '$(GameAppIcon)' == '' ">$(_BottlenoseLabsSdkContentDirectoryPath)/GameApp/Packaging/DefaultIcon.png</GameAppIcon>
+    <GameAppIcon>$([System.IO.Path]::GetFullPath('$(GameAppIcon)'))</GameAppIcon>
+    <!-- Name people see, for example in the macOS menu bar and Linux app menus -->
+    <GameAppDisplayName Condition=" '$(GameAppDisplayName)' == '' ">$(Product)</GameAppDisplayName>
+    <!-- macOS bundle identifier: reverse-DNS, letters, digits, '.' and '-' only -->
+    <GameAppBundleIdentifier Condition=" '$(GameAppBundleIdentifier)' == '' ">$([System.Text.RegularExpressions.Regex]::Replace('com.$(Company).$(AssemblyName)', '[^A-Za-z0-9.-]', '-').ToLowerInvariant())</GameAppBundleIdentifier>
+    <!-- macOS wants a plain number version: drop any pre-release suffix (2026.11.27-rc becomes 2026.11.27) -->
+    <_GameAppBundleVersion>$([System.Text.RegularExpressions.Regex]::Replace('$(Version)', '-.*$', ''))</_GameAppBundleVersion>
+    <_GameAppPackagingDirectory>$(_BottlenoseLabsSdkContentDirectoryPath)/GameApp/Packaging</_GameAppPackagingDirectory>
+    <_GameAppWindowsIconPath>$(IntermediateOutputPath)$(AssemblyName).ico</_GameAppWindowsIconPath>
+  </PropertyGroup>
+
+  <!-- Windows icon: made from the PNG on Windows build machines, which have System.Drawing; set ApplicationIcon to use your own .ico -->
+  <Target Name="_GameAppWindowsIcon"
+          BeforeTargets="CoreCompile"
+          Condition=" '$(ApplicationIcon)' == '' AND '$(IsWindows)' == 'true' "
+          Inputs="$(GameAppIcon);$(_GameAppPackagingDirectory)/WindowsIcon.ps1"
+          Outputs="$(_GameAppWindowsIconPath)">
+    <Exec Command="powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File &quot;$(_GameAppPackagingDirectory)/WindowsIcon.ps1&quot; -Source &quot;$(GameAppIcon)&quot; -Destination &quot;$(_GameAppWindowsIconPath)&quot;" />
+    <PropertyGroup>
+      <ApplicationIcon>$(_GameAppWindowsIconPath)</ApplicationIcon>
+    </PropertyGroup>
+    <ItemGroup>
+      <FileWrites Include="$(_GameAppWindowsIconPath)" />
+    </ItemGroup>
+  </Target>
+
+  <!-- macOS and Linux: after publishing, turn the publish folder into the app format. Set IsEnabledPlatformPackaging to false to keep a plain folder -->
+  <Target Name="_GameAppPlatformPackage" AfterTargets="Publish" Condition=" '$(IsEnabledPlatformPackaging)' == 'true' ">
+    <PropertyGroup>
+      <_GameAppRuntimeIdentifier>$(RuntimeIdentifier)</_GameAppRuntimeIdentifier>
+      <_GameAppRuntimeIdentifier Condition=" '$(_GameAppRuntimeIdentifier)' == '' ">$(NETCoreSdkPortableRuntimeIdentifier)</_GameAppRuntimeIdentifier>
+      <_GameAppPackageOS Condition=" $(_GameAppRuntimeIdentifier.StartsWith('osx')) ">osx</_GameAppPackageOS>
+      <_GameAppPackageOS Condition=" $(_GameAppRuntimeIdentifier.StartsWith('linux')) ">linux</_GameAppPackageOS>
+    </PropertyGroup>
+    <Exec Condition=" '$(_GameAppPackageOS)' != '' "
+          Command="bash &quot;$(_GameAppPackagingDirectory)/Package.sh&quot; $(_GameAppPackageOS) &quot;$(PublishDir)&quot; &quot;$(AssemblyName)&quot; &quot;$(GameAppDisplayName)&quot; &quot;$(GameAppBundleIdentifier)&quot; &quot;$(_GameAppBundleVersion)&quot; &quot;$(GameAppMinimumMacOSVersion)&quot; &quot;$(GameAppIcon)&quot;" />
+    <Message Condition=" '$(_GameAppPackageOS)' == 'osx' " Importance="high" Text="$(MSBuildProjectName) -> $(PublishDir)$(AssemblyName).app" />
+    <Message Condition=" '$(_GameAppPackageOS)' == 'linux' " Importance="high" Text="$(MSBuildProjectName) -> $(PublishDir)$(AssemblyName).AppDir" />
+  </Target>
+
+</Project>

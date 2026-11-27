@@ -16,4 +16,7 @@
     <AssemblyAttribute Include="System.Runtime.CompilerServices.DisableRuntimeMarshallingAttribute" />
   </ItemGroup>
 
+  <!-- Icon, Windows manifest, and the platform's app format on publish -->
+  <Import Project="$(MSBuildThisFileDirectory)Packaging/Packaging.targets" />
+
 </Project>

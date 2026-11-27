@@ -34,3 +34,24 @@ jobs:
       # The game consumer uses the SDK from the local folder feed, so pack it first
       pre-publish-script: "dotnet pack ./src/cs --nologo --verbosity minimal --configuration Release"
       retention-days: 1
+
+  game-publish-check-job:
+    name: "Game publish: run the Linux AppImage"
+    needs: [game-publish-job]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+
+      - name: "Download"
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: "GameApp-linux-x64"
+          path: "./download"
+
+      - name: "Run"
+        shell: bash
+        run: |
+          mkdir game && tar -xzf ./download/GameApp-linux-x64.tar.gz -C game
+          ls -la game
+          # The test game only prints a line, so it runs without a display; no FUSE on runners, so extract and run
+          ./game/GameApp.AppImage --appimage-extract-and-run

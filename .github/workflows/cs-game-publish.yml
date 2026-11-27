@@ -11,6 +11,7 @@
 #         runtime-identifiers: '["win-x64", "win-arm64", "osx-arm64", "osx-x64", "linux-x64", "linux-arm64"]'
 #
 # Each artifact is named `<artifact-name>-<runtime identifier>` and holds one archive: `.zip` for Windows, `.tar.gz` otherwise.
+# With bottlenoselabs.Sdk.GameApp the archive holds <name>.exe (Windows), <name>.app (macOS), or one <name>.AppImage file (Linux).
 # The archive keeps the executable permission on macOS and Linux, which uploading the folder directly would lose.
 
 name: "C# game publish"
@@ -132,6 +133,48 @@ jobs:
           fi
           dotnet publish "$PROJECT" --nologo --verbosity minimal --configuration Release --runtime "$RID" \
             --output "$RUNNER_TEMP/publish/$RID" "${VERSION_ARGUMENTS[@]}"
+
+      - name: "AppImage"
+        # bottlenoselabs.Sdk.GameApp publishes <name>.AppDir on Linux; turn it into one <name>.AppImage file that runs on most distributions
+        if: ${{ startsWith(matrix.rid, 'linux-') }}
+        env:
+          RID: ${{ matrix.rid }}
+        run: |
+          # Pinned releases, checked against their SHA-256 digests: appimagetool 1.9.1 and the AppImage type 2 runtime 20251108
+          case "$RID" in
+            linux-x64)
+              ARCH="x86_64"
+              TOOL_SHA256="ed4ce84f0d9caff66f50bcca6ff6f35aae54ce8135408b3fa33abfc3cb384eb0"
+              RUNTIME_SHA256="2fca8b443c92510f1483a883f60061ad09b46b978b2631c807cd873a47ec260d"
+              ;;
+            linux-arm64)
+              ARCH="aarch64"
+              TOOL_SHA256="f0837e7448a0c1e4e650a93bb3e85802546e60654ef287576f46c71c126a9158"
+              RUNTIME_SHA256="00cbdfcf917cc6c0ff6d3347d59e0ca1f7f45a6df1a428a0d6d8a78664d87444"
+              ;;
+            *)
+              echo "No AppImage tools for $RID" >&2
+              exit 1
+              ;;
+          esac
+          TOOL="$RUNNER_TEMP/appimagetool"
+          RUNTIME="$RUNNER_TEMP/appimage-runtime"
+          curl --fail --silent --show-error --location --output "$TOOL" "https://github.com/AppImage/appimagetool/releases/download/1.9.1/appimagetool-$ARCH.AppImage"
+          curl --fail --silent --show-error --location --output "$RUNTIME" "https://github.com/AppImage/type2-runtime/releases/download/20251108/runtime-$ARCH"
+          echo "$TOOL_SHA256  $TOOL" | sha256sum --check --strict
+          echo "$RUNTIME_SHA256  $RUNTIME" | sha256sum --check --strict
+          chmod +x "$TOOL"
+
+          cd "$RUNNER_TEMP/publish/$RID"
+          APPDIR="$(find . -mindepth 1 -maxdepth 1 -name "*.AppDir" | head -n 1)"
+          if [[ -z "$APPDIR" ]]; then
+            echo "No .AppDir in the publish folder; is IsEnabledPlatformPackaging off?" >&2
+            exit 1
+          fi
+          NAME="$(basename "$APPDIR" .AppDir)"
+          # Extract-and-run: runners have no FUSE to mount appimagetool itself
+          ARCH="$ARCH" "$TOOL" --appimage-extract-and-run --no-appstream --runtime-file "$RUNTIME" "$APPDIR" "$NAME.AppImage"
+          rm -rf "$APPDIR"
 
       - name: "Archive"
         id: archive
