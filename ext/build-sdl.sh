@@ -16,27 +16,12 @@ source_dir="$root/ext/SDL"
 # The oldest macOS that .NET 11 supports; matches GameAppMinimumMacOSVersion
 macos_minimum_version="15.0"
 
-host_rid() {
-    local os arch
-    case "$(uname -s)" in
-        Darwin) os="osx" ;;
-        Linux) os="linux" ;;
-        MINGW* | MSYS* | CYGWIN*) os="win" ;;
-        *) echo "Unsupported operating system: $(uname -s)" >&2; exit 1 ;;
-    esac
-    case "$(uname -m)" in
-        x86_64 | amd64) arch="x64" ;;
-        arm64 | aarch64) arch="arm64" ;;
-        *) echo "Unsupported CPU architecture: $(uname -m)" >&2; exit 1 ;;
-    esac
-    echo "$os-$arch"
-}
+# HOST_RID, HOST_RID_OS: this computer's runtime identifier and its operating system part
+source "$root/src/bash/host-rid.sh"
 
-rid="${1:-$(host_rid)}"
-host_os="$(host_rid)"
-host_os="${host_os%%-*}"
-if [[ "${rid%%-*}" != "$host_os" ]]; then
-    echo "Can't build $rid on this computer ($host_os); build it on its own operating system" >&2
+rid="${1:-$HOST_RID}"
+if [[ "${rid%%-*}" != "$HOST_RID_OS" ]]; then
+    echo "Can't build $rid on this computer ($HOST_RID); build it on its own operating system" >&2
     exit 1
 fi
 

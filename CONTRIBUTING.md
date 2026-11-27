@@ -14,6 +14,8 @@ Bugs and ideas go in [issues](https://github.com/bottlenoselabs/sdk/issues). For
 ext/
   SDL/                   SDL's C source, a Git submodule pinned to an SDL release
   build-sdl.sh           Builds the native SDL library into lib/<runtime identifier>/
+src/bash/
+  host-rid.sh            This computer's .NET runtime identifier (HOST_RID), for other scripts to source
 src/cs/
   production/
     Sdk/                 Shared settings for every SDK, and the bottlenoselabs.Sdk package
