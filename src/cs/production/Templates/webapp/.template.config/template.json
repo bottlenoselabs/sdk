@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "Bottlenose Labs",
+  "classifications": [
+    "Web",
+    "WebAPI"
+  ],
+  "identity": "bottlenoselabs.Templates.WebApp",
+  "name": "Bottlenose Labs web app",
+  "description": "A repository for a C# ASP.NET Core minimal-API web app on bottlenoselabs.Sdk.WebApp, compiled with NativeAOT in Release.",
+  "shortName": "bl-webapp",
+  "sourceName": "MyWebApp",
+  "preferNameDirectory": true,
+  "tags": {
+    "language": "C#",
+    "type": "solution"
+  }
+}

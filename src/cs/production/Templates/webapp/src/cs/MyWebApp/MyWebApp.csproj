@@ -1,0 +1,7 @@
+<Project Sdk="bottlenoselabs.Sdk.WebApp">
+
+  <PropertyGroup>
+    <TargetFramework>DOTNET_TARGET_FRAMEWORK</TargetFramework>
+  </PropertyGroup>
+
+</Project>

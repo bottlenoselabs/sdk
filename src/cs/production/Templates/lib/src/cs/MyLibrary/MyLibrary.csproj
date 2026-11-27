@@ -1,0 +1,13 @@
+<Project Sdk="bottlenoselabs.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>DOTNET_TARGET_FRAMEWORK</TargetFramework>
+  </PropertyGroup>
+
+  <!-- NuGet: the package ID is bottlenoselabs.MyLibrary -->
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <PackageDescription>TODO: describe MyLibrary.</PackageDescription>
+  </PropertyGroup>
+
+</Project>

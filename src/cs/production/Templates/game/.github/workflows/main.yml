@@ -1,0 +1,34 @@
+name: "Main"
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - "main"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.ref }}"
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+
+  build-job:
+    name: "Build"
+    uses: "bottlenoselabs/sdk/.github/workflows/cs-build.yml@vBOTTLENOSELABS_SDK_VERSION"
+    with:
+      path: "./src/cs"
+      # Set to true once the solution has test projects
+      test: false
+
+  publish-job:
+    name: "Publish"
+    needs: [build-job]
+    uses: "bottlenoselabs/sdk/.github/workflows/cs-game-publish.yml@vBOTTLENOSELABS_SDK_VERSION"
+    with:
+      project: "./src/cs/MyGame/MyGame.csproj"
+      # Add "win-arm64", "osx-x64" or "linux-arm64" as needed
+      runtime-identifiers: '["win-x64", "osx-arm64", "linux-x64"]'

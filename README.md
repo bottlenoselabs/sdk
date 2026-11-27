@@ -43,6 +43,22 @@ There is one SDK per kind of project. Each one wraps a Microsoft SDK and adds th
    <Project Sdk="bottlenoselabs.Sdk.GameApp" />
    ```
 
+## Start a new repository from a template
+
+```bash
+dotnet new install bottlenoselabs.Templates
+dotnet new bl-game --name MyGame       # or bl-webapp, bl-lib
+cd MyGame && git init
+```
+
+| Template | Creates |
+| --- | --- |
+| `bl-game` | A game on `bottlenoselabs.Sdk.GameApp`, with CI that builds it and publishes it for Windows, macOS and Linux |
+| `bl-webapp` | A NativeAOT minimal-API web app on `bottlenoselabs.Sdk.WebApp`, with CI |
+| `bl-lib` | A library on `bottlenoselabs.Sdk`, with CI and a release workflow for NuGet.org |
+
+Each new repository pins the SDK versions in `global.json`, and the reusable workflows by tag, to the release the templates came from. Run `git init` before building: the SDK puts build output under the Git repository root.
+
 ## What every SDK sets
 
 | Area | Property | Value |

@@ -1,0 +1,2 @@
+<!-- bottlenoselabs.Sdk.GameApp sets the output type, the target framework and the Assets folder; see https://github.com/bottlenoselabs/sdk -->
+<Project Sdk="bottlenoselabs.Sdk.GameApp" />

@@ -1,0 +1,52 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- `dotnet new` template package: bottlenoselabs.Templates -->
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <PackageType>Template</PackageType>
+    <PackageDescription>`dotnet new` templates for Bottlenose Labs repositories: bl-game, bl-webapp and bl-lib.</PackageDescription>
+    <PackageTags>dotnet-new;templates;game;webapp;library</PackageTags>
+    <RepositoryUrl>https://github.com/bottlenoselabs/sdk</RepositoryUrl>
+    <IsPackable>true</IsPackable>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <IncludeSymbols>false</IncludeSymbols>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <!-- The template files are content, not part of this project's build -->
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <NoWarn>$(NoWarn);NU5128</NoWarn> <!-- No lib/ folder, on purpose -->
+    <!-- Keep dotfiles and dot folders: .gitignore, .editorconfig, .github/, .template.config/ -->
+    <NoDefaultExcludes>true</NoDefaultExcludes>
+  </PropertyGroup>
+
+  <!--
+    Before packing: copy each template, plus the files in shared/, to obj/, and fill in the placeholders, so a new repository pins
+    the SDK and workflows from the same release as these templates, and the .NET version they were built with.
+  -->
+  <Target Name="PrepareTemplates" BeforeTargets="_GetPackageFiles">
+
+    <PropertyGroup>
+      <_TemplatesOutputPath>$(IntermediateOutputPath)templates/</_TemplatesOutputPath>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <_TemplateName Include="game;webapp;lib" />
+      <_TemplateSource Include="$(MSBuildProjectDirectory)/%(_TemplateName.Identity)/**/*" TemplateName="%(_TemplateName.Identity)" />
+      <_TemplateSource Include="$(MSBuildProjectDirectory)/shared/**/*" TemplateName="%(_TemplateName.Identity)" />
+    </ItemGroup>
+
+    <RemoveDir Directories="$(_TemplatesOutputPath)" />
+    <MakeDir Directories="$(_TemplatesOutputPath)%(_TemplateSource.TemplateName)/%(_TemplateSource.RecursiveDir)" />
+    <WriteLinesToFile
+      File="$(_TemplatesOutputPath)%(_TemplateSource.TemplateName)/%(_TemplateSource.RecursiveDir)%(_TemplateSource.Filename)%(_TemplateSource.Extension)"
+      Lines="$([MSBuild]::Escape($([System.IO.File]::ReadAllText('%(_TemplateSource.FullPath)').TrimEnd().Replace('BOTTLENOSELABS_SDK_VERSION', '$(PackageVersion)').Replace('DOTNET_SDK_VERSION', '$(NETCoreSdkVersion)').Replace('DOTNET_TARGET_FRAMEWORK', 'net$(BundledNETCoreAppTargetFrameworkVersion)'))))"
+      Overwrite="true"
+      WriteOnlyWhenDifferent="true" />
+
+    <ItemGroup>
+      <None Include="$(_TemplatesOutputPath)**/*" Pack="true" PackagePath="content/" />
+    </ItemGroup>
+
+  </Target>
+
+</Project>
