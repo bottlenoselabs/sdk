@@ -19,9 +19,11 @@
     </Compile>
   </ItemGroup>
 
-  <!-- The native library: a package dependency of bottlenoselabs.SDL.Interop, not a compile reference -->
+  <!-- The native library, so the bottlenoselabs.SDL.Interop package depends on bottlenoselabs.SDL.Native. A plain reference: NuGet
+       leaves out references with ReferenceOutputAssembly="false" from the dependencies. SDL.Native's own assembly is empty and its
+       package doesn't include it -->
   <ItemGroup>
-    <ProjectReference Include="../SDL.Native/SDL.Native.csproj" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="../SDL.Native/SDL.Native.csproj" />
   </ItemGroup>
 
   <ItemGroup>
