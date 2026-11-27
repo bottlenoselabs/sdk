@@ -80,3 +80,46 @@ jobs:
           for id in bottlenoselabs.Sdk bottlenoselabs.Sdk.WebApp bottlenoselabs.Sdk.GameApp bottlenoselabs.Templates; do
             test -f "./nupkg/$id.$VERSION.nupkg" || { echo "Missing ./nupkg/$id.$VERSION.nupkg" >&2; exit 1; }
           done
+
+  sdl-native-job:
+    name: "SDL native"
+    uses: "./.github/workflows/sdl-native.yml"
+
+  sdl-package-job:
+    name: "SDL native package"
+    needs: [sdl-native-job]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+
+      - name: "Clone Git repository"
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: "Setup .NET"
+        uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          global-json-file: global.json
+
+      - name: "Download native libraries"
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: "sdl-native-*"
+          path: "./lib-download"
+
+      - name: "Pack and check"
+        shell: bash
+        run: |
+          # Artifacts download as lib-download/sdl-native-<rid>/<file>; the package projects read lib/<rid>/<file>
+          for folder in lib-download/sdl-native-*; do
+            rid="${folder#lib-download/sdl-native-}"
+            mkdir -p "lib/$rid" && cp -v "$folder"/* "lib/$rid/"
+          done
+          dotnet pack src/cs/production/SDL.Native --nologo --verbosity minimal --configuration Release -p:RequireSdlNativeLibraries=true
+          package="$(ls nupkg/bottlenoselabs.SDL.Native.*.nupkg)"
+          for pair in win-x64:SDL3.dll win-arm64:SDL3.dll osx-x64:libSDL3.dylib osx-arm64:libSDL3.dylib linux-x64:libSDL3.so linux-arm64:libSDL3.so; do
+            rid="${pair%%:*}"
+            file="${pair##*:}"
+            unzip -l "$package" | grep -q " runtimes/$rid/native/$file$" || { echo "$package is missing runtimes/$rid/native/$file" >&2; exit 1; }
+            echo "$package: runtimes/$rid/native/$file"
+          done
+          unzip -p "$package" "*.nuspec" | grep -q '<license type="expression">Zlib</license>' || { echo "$package should have the Zlib license" >&2; exit 1; }

@@ -31,9 +31,13 @@ jobs:
       test: false
       script: "./src/cs/tests/Consumers/test.sh"
 
+  sdl-native-job:
+    name: "SDL native"
+    uses: "./.github/workflows/sdl-native.yml"
+
   release-job:
     name: "Release"
-    needs: [build-job]
+    needs: [build-job, sdl-native-job]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     # The job is in this file, so the NuGet.org trusted publishing policy names `release.yml`
@@ -45,8 +49,25 @@ jobs:
       - name: "Clone Git repository"
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
+      - name: "Download SDL native libraries"
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: "sdl-native-*"
+          path: "./lib-download"
+
+      - name: "Put SDL native libraries in lib/"
+        shell: bash
+        run: |
+          for folder in lib-download/sdl-native-*; do
+            rid="${folder#lib-download/sdl-native-}"
+            mkdir -p "lib/$rid" && cp -v "$folder"/* "lib/$rid/"
+          done
+
       - name: "Release"
         uses: "./.github/actions/cs-release"
+        env:
+          # Fail instead of releasing without one of the native SDL packages
+          RequireSdlNativeLibraries: "true"
         with:
           path: "./src/cs"
           pre-release: ${{ inputs.pre-release }}

@@ -14,3 +14,7 @@
 /src/cs/tests/**/.packages/
 /src/cs/tests/**/artifacts/
 /src/cs/tests/**/obj/
+
+# Native libraries built from ext/ (ext/build-sdl.sh)
+/lib/
+/ext/.build/

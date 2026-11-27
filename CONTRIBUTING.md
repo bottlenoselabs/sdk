@@ -11,6 +11,11 @@ Bugs and ideas go in [issues](https://github.com/bottlenoselabs/sdk/issues). For
   workflows/cs-build.yml, cs-game-publish.yml   Reusable workflows, for other repositories
   actions/cs-release/                           The release action, for other repositories
   workflows/main.yml, release.yml               This repository's own CI, which uses the reusable workflows and the action
+ext/
+  SDL/                   SDL's C source, a Git submodule pinned to an SDL release
+  build-sdl.sh           Builds the native SDL library into lib/<runtime identifier>/
+src/bash/
+  host-rid.sh            This computer's .NET runtime identifier (HOST_RID), for other scripts to source
 src/cs/
   production/
     Sdk/                 Shared settings for every SDK, and the bottlenoselabs.Sdk package
@@ -24,6 +29,7 @@ src/cs/
     Sdk.WebApp/Sdk/      The entry points for bottlenoselabs.Sdk.WebApp
     Sdk.GameApp/Sdk/     The entry points for bottlenoselabs.Sdk.GameApp
     SdkPackage.targets   How the three SDK packages are packed
+    SDL.Native/          bottlenoselabs.SDL.Native: the native SDL library for every platform
     Templates/           bottlenoselabs.Templates: the bl-game, bl-webapp and bl-lib templates
   tests/Consumers/       Test projects that use the packed SDKs, and test.sh
 docs/                    Documentation
@@ -83,6 +89,26 @@ When you add or change a setting, add a check for it to `Directory.Build.targets
 CI runs the script on Windows, Linux and macOS for every pull request, publishes the game consumer with `cs-game-publish.yml`, and runs the Linux AppImage it produces.
 
 To lint workflows, use [actionlint](https://github.com/rhysd/actionlint).
+
+## SDL
+
+SDL's C source is in the `ext/SDL` submodule, pinned to an SDL release. You only need it to build the native library; clone it with:
+
+```bash
+git submodule update --init --depth 1 ext/SDL
+```
+
+Build the native library for your computer with `ext/build-sdl.sh`. It writes `lib/<runtime identifier>/` (for example `lib/osx-arm64/libSDL3.dylib`), which `SDL.Native` packs as `runtimes/<runtime identifier>/native/`. Platforms you haven't built are left out of a local package. You need CMake and a C compiler; on Linux, also [SDL's development packages](https://wiki.libsdl.org/SDL3/README-linux).
+
+In CI, `.github/workflows/sdl-native.yml` builds all six platforms. Each build is cached by the SDL commit and the build script, so SDL is only rebuilt when one of them changes.
+
+To upgrade SDL, check out a newer release tag in the submodule and commit the change:
+
+```bash
+git -C ext/SDL fetch --depth 1 origin tag release-<version>
+git -C ext/SDL checkout release-<version>
+git add ext/SDL
+```
 
 ## Releasing
 

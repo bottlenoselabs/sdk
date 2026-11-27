@@ -1,0 +1,150 @@
+# Builds the native SDL library for every platform from the ext/SDL submodule, with ext/build-sdl.sh, and uploads each as an
+# artifact named `sdl-native-<runtime identifier>` holding lib/<runtime identifier>/. Used by this repository's main and release
+# workflows.
+#
+# Each build is cached by the SDL commit and the build script, so SDL is only rebuilt when one of them changes. On a cache hit the
+# submodule isn't even cloned.
+
+name: "SDL native"
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+
+  build-job:
+    name: "SDL: ${{ matrix.rid }}"
+    # Windows and macOS; Linux is built in linux-build-job
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { rid: win-x64, os: windows-latest }
+          - { rid: win-arm64, os: windows-latest }
+          - { rid: osx-x64, os: macos-latest }
+          - { rid: osx-arm64, os: macos-latest }
+    defaults:
+      run:
+        shell: bash
+    steps:
+
+      - name: "Clone Git repository"
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: "SDL commit"
+        id: sdl
+        run: |
+          # The commit the submodule is pinned to, read without cloning the submodule
+          COMMIT="$(git ls-tree HEAD ext/SDL | awk '{ print $3 }')"
+          echo "COMMIT=$COMMIT"
+          echo "COMMIT=$COMMIT" >> "$GITHUB_OUTPUT"
+
+      - name: "Cache"
+        id: cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: "lib/${{ matrix.rid }}"
+          key: "sdl-native-${{ matrix.rid }}-${{ steps.sdl.outputs.COMMIT }}-${{ hashFiles('ext/build-sdl.sh') }}"
+
+      - name: "Clone SDL"
+        if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+        run: git submodule update --init --depth 1 ext/SDL
+
+      - name: "Build"
+        if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+        env:
+          RID: ${{ matrix.rid }}
+        run: ./ext/build-sdl.sh "$RID"
+
+      - name: "Upload"
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: "sdl-native-${{ matrix.rid }}"
+          path: "lib/${{ matrix.rid }}"
+          if-no-files-found: error
+
+  linux-build-job:
+    name: "SDL: ${{ matrix.rid }}"
+    runs-on: ${{ matrix.os }}
+    # Built on an old distribution so the library runs on newer ones: glibc runs programs built against older versions, not newer.
+    # Ubuntu 22.04 has glibc 2.35, older than every Linux distribution .NET 11 supports.
+    container: "ubuntu:22.04"
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { rid: linux-x64, os: ubuntu-latest }
+          - { rid: linux-arm64, os: ubuntu-24.04-arm }
+    defaults:
+      run:
+        shell: bash
+    steps:
+
+      - name: "Install Git"
+        # actions/checkout needs Git in the container to clone (not just download) the repository, for submodules
+        run: |
+          apt-get update
+          apt-get install --yes --no-install-recommends git ca-certificates
+
+      - name: "Clone Git repository"
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: "SDL commit"
+        id: sdl
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          COMMIT="$(git ls-tree HEAD ext/SDL | awk '{ print $3 }')"
+          echo "COMMIT=$COMMIT"
+          echo "COMMIT=$COMMIT" >> "$GITHUB_OUTPUT"
+
+      - name: "Cache"
+        id: cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: "lib/${{ matrix.rid }}"
+          key: "sdl-native-${{ matrix.rid }}-ubuntu22.04-${{ steps.sdl.outputs.COMMIT }}-${{ hashFiles('ext/build-sdl.sh') }}"
+
+      - name: "Clone SDL"
+        if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+        run: git submodule update --init --depth 1 ext/SDL
+
+      - name: "Install build dependencies"
+        if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+        # https://wiki.libsdl.org/SDL3/README-linux. SDL loads these libraries at runtime; only their headers are needed to build
+        run: |
+          DEBIAN_FRONTEND=noninteractive apt-get install --yes --no-install-recommends build-essential cmake ninja-build pkg-config \
+            libasound2-dev libpulse-dev libaudio-dev libjack-dev libsndio-dev libpipewire-0.3-dev \
+            libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxfixes-dev libxi-dev libxss-dev libxtst-dev libxkbcommon-dev \
+            libdrm-dev libgbm-dev libgl1-mesa-dev libgles2-mesa-dev libegl1-mesa-dev \
+            libwayland-dev libdecor-0-dev liburing-dev libdbus-1-dev libibus-1.0-dev libudev-dev fcitx-libs-dev
+
+      - name: "Build"
+        if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+        env:
+          RID: ${{ matrix.rid }}
+        run: ./ext/build-sdl.sh "$RID"
+
+      - name: "Check glibc"
+        env:
+          RID: ${{ matrix.rid }}
+        run: |
+          # The newest glibc symbol version the library needs; it must not exceed Ubuntu 22.04's
+          NEWEST="$(grep -aoE 'GLIBC_2\.[0-9]+(\.[0-9]+)?' "lib/$RID/libSDL3.so" | sort -uV | tail -n 1)"
+          echo "lib/$RID/libSDL3.so needs up to $NEWEST"
+          if [[ "$(printf '%s\n' "$NEWEST" GLIBC_2.35 | sort -V | tail -n 1)" != "GLIBC_2.35" ]]; then
+            echo "::error::lib/$RID/libSDL3.so needs $NEWEST, newer than glibc 2.35; it won't load on older Linux distributions"
+            exit 1
+          fi
+
+      - name: "Upload"
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: "sdl-native-${{ matrix.rid }}"
+          path: "lib/${{ matrix.rid }}"
+          if-no-files-found: error
