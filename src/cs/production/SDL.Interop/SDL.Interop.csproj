@@ -1,0 +1,38 @@
+<!--
+  Package bottlenoselabs.SDL.Interop: C# bindings for SDL, 1:1 with SDL's C API ("unsafe" API). Generated/ is written by
+  bindgen/SDL/bindgen.sh from the ext/SDL headers; don't edit it by hand. Depends on bottlenoselabs.SDL.Native for the native library.
+-->
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <RootNamespace>bottlenoselabs.Interop</RootNamespace>
+    <IsPackable>true</IsPackable>
+    <PackageDescription>C# bindings for SDL 3 ("unsafe" API): 1:1 with SDL's C API, generated from SDL's headers with c2cs. Native library: bottlenoselabs.SDL.Native.</PackageDescription>
+    <PackageTags>SDL;SDL3;bindings;interop</PackageTags>
+  </PropertyGroup>
+
+  <!-- Generated code: written by c2cs, so not held to this repository's code style or documentation rules -->
+  <ItemGroup>
+    <Compile Update="Generated/**/*.cs">
+      <Link>Generated/%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Compile>
+  </ItemGroup>
+
+  <!-- The native library: a package dependency of bottlenoselabs.SDL.Interop, not a compile reference -->
+  <ItemGroup>
+    <ProjectReference Include="../SDL.Native/SDL.Native.csproj" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="JetBrains.Annotations" Version="2026.2.0" PrivateAssets="all" />
+  </ItemGroup>
+
+  <!-- Partial types split across files -->
+  <ItemGroup>
+    <Compile Update="Rgba8U.Colors.cs" DependentUpon="Rgba8U.cs" />
+    <Compile Update="Rgba32F.Colors.cs" DependentUpon="Rgba32F.cs" />
+    <Compile Update="Rgb8U.Colors.cs" DependentUpon="Rgb8U.cs" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,25 @@
+<!-- Package bottlenoselabs.SDL: an idiomatic C# API over SDL ("safe" API), built on bottlenoselabs.SDL.Interop -->
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <RootNamespace>bottlenoselabs.SDL</RootNamespace>
+    <IsPackable>true</IsPackable>
+    <PackageDescription>An idiomatic C# API for SDL 3 ("safe" API): windows, input, 2D rendering, and the SDL GPU API. Built on bottlenoselabs.SDL.Interop.</PackageDescription>
+    <PackageTags>SDL;SDL3;game;gpu;windowing;input</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../SDL.Interop/SDL.Interop.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="11.0.0" />
+    <PackageReference Include="JetBrains.Annotations" Version="2026.2.0" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Application.Static.cs" DependentUpon="Application.cs" />
+  </ItemGroup>
+
+</Project>

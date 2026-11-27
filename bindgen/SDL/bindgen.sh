@@ -8,7 +8,9 @@
 #   merge      Combine every ffi/<target>.json into ffi-x/cross-platform.json.
 #   generate   Write the C# bindings from ffi-x/cross-platform.json (config-generate-cs.json).
 #
-# c2ffi can exit with 0 even when extraction fails, so each step checks its output files instead of trusting the exit code.
+# c2ffi can exit with 0 even when extraction fails, and only warns when it can't find a target's C library headers (then
+# extracts wrong type sizes), so each step checks its output instead of trusting the exit code. See
+# https://github.com/bottlenoselabs/c2ffi/issues/49.
 set -euo pipefail
 
 directory="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -38,9 +40,27 @@ case "${1:-}" in
     extract)
         [[ -f "$root/ext/SDL/include/SDL3/SDL.h" ]] || { echo "SDL headers not found; run: git submodule update --init --depth 1 ext/SDL" >&2; exit 1; }
         rm -rf ./ffi
-        dotnet tool run c2ffi extract --config ./config-extract.json
+        log="$(mktemp)"
+        dotnet tool run c2ffi extract --config ./config-extract.json 2>&1 | tee "$log"
+
+        # Without a target's C library headers, clang treats unknown types such as int64_t as int, so every size is wrong
+        if grep -q "Could not find system include directory" "$log"; then
+            echo "bindgen.sh: c2ffi couldn't find a target's C library headers:" >&2
+            grep -o "Could not find system include directory: [^ ]*" "$log" | sort -u >&2
+            exit 1
+        fi
+        rm -f "$log"
+
         for target in "${targets[@]}"; do
             require_file "./ffi/$target.json" "c2ffi extract"
+
+            # SDL guarantees SDL_Event is 128 bytes on every platform (SDL_COMPILE_TIME_ASSERT in SDL_events.h); any other size
+            # means the headers were read wrong
+            sizes="$(grep -A2 '"name": "union SDL_Event"' "./ffi/$target.json" | grep -oE '"size_of": [0-9]+' | grep -oE '[0-9]+' | sort -u)"
+            if [[ "$sizes" != "128" ]]; then
+                echo "bindgen.sh: SDL_Event is ${sizes:-missing} bytes in ffi/$target.json instead of 128; the extraction for $target is wrong" >&2
+                exit 1
+            fi
         done
         ;;
     merge)

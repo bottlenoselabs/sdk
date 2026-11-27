@@ -60,9 +60,10 @@ jobs:
 
       - name: "Install Linux dependencies"
         if: ${{ runner.os == 'Linux' }}
-        # libclang for c2ffi (found at /usr/lib/llvm-18/lib/libclang.so.1), and the Arm64 C library headers for the
-        # aarch64-unknown-linux-gnu target
-        run: sudo apt-get update && sudo apt-get install --yes --no-install-recommends libclang1-18 gcc-aarch64-linux-gnu
+        # libclang for c2ffi (found at /usr/lib/llvm-18/lib/libclang.so.1), and the Arm64 C library headers in
+        # /usr/aarch64-linux-gnu/include for the aarch64-unknown-linux-gnu target (libc6-dev-arm64-cross, which
+        # gcc-aarch64-linux-gnu only recommends)
+        run: sudo apt-get update && sudo apt-get install --yes --no-install-recommends libclang1-18 gcc-aarch64-linux-gnu libc6-dev-arm64-cross
 
       - name: "Extract"
         run: ./bindgen/SDL/bindgen.sh extract
