@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "bottlenoselabs.c2ffi.tool": {
+      "version": "2025.1.21",
+      "commands": [
+        "c2ffi"
+      ],
+      "rollForward": true
+    },
+    "bottlenoselabs.c2cs.tool": {
+      "version": "2026.4.27",
+      "commands": [
+        "c2cs"
+      ],
+      "rollForward": true
+    }
+  }
+}

@@ -11,6 +11,7 @@ Bugs and ideas go in [issues](https://github.com/bottlenoselabs/sdk/issues). For
   workflows/cs-build.yml, cs-game-publish.yml   Reusable workflows, for other repositories
   actions/cs-release/                           The release action, for other repositories
   workflows/main.yml, release.yml               This repository's own CI, which uses the reusable workflows and the action
+bindgen/SDL/             Generates the SDL C# bindings (bindgen.sh, with c2ffi and c2cs from dotnet-tools.json)
 ext/
   SDL/                   SDL's C source, a Git submodule pinned to an SDL release
   build-sdl.sh           Builds the native SDL library into lib/<runtime identifier>/
@@ -29,6 +30,8 @@ src/cs/
     Sdk.WebApp/Sdk/      The entry points for bottlenoselabs.Sdk.WebApp
     Sdk.GameApp/Sdk/     The entry points for bottlenoselabs.Sdk.GameApp
     SdkPackage.targets   How the three SDK packages are packed
+    SDL/                 bottlenoselabs.SDL: the idiomatic C# API for SDL ("safe" API)
+    SDL.Interop/         bottlenoselabs.SDL.Interop: the C# bindings, 1:1 with SDL's C API; Generated/ is written by bindgen
     SDL.Native/          bottlenoselabs.SDL.Native: the native SDL library for every platform
     Templates/           bottlenoselabs.Templates: the bl-game, bl-webapp and bl-lib templates
   tests/Consumers/       Test projects that use the packed SDKs, and test.sh
@@ -102,7 +105,9 @@ Build the native library for your computer with `ext/build-sdl.sh`. It writes `l
 
 In CI, `.github/workflows/sdl-native.yml` builds all six platforms. Each build is cached by the SDL commit and the build script, so SDL is only rebuilt when one of them changes.
 
-To upgrade SDL, check out a newer release tag in the submodule and commit the change:
+The C# bindings in `src/cs/production/SDL.Interop/Generated/` are generated from the same headers by `bindgen/SDL/bindgen.sh`: `extract` reads SDL's C API with clang for each platform (c2ffi), `merge` combines them, and `generate` writes the C# code (c2cs). Each operating system can only extract its own platforms, so `.github/workflows/sdl-bindgen.yml` does it on Windows, macOS and Linux whenever the bindgen setup or the SDL submodule changes. It fails if the committed bindings differ from what it generates, and uploads the generated files as the `sdl-bindings` artifact; commit those. Don't edit `Generated/` by hand.
+
+To upgrade SDL, check out a newer release tag in the submodule, then commit it together with the regenerated bindings from the `sdl-bindings` artifact:
 
 ```bash
 git -C ext/SDL fetch --depth 1 origin tag release-<version>

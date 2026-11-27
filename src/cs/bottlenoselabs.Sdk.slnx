@@ -3,6 +3,8 @@
     <Project Path="production/Sdk/Sdk.csproj" />
     <Project Path="production/Sdk.GameApp/Sdk.GameApp.csproj" />
     <Project Path="production/Sdk.WebApp/Sdk.WebApp.csproj" />
+    <Project Path="production/SDL/SDL.csproj" />
+    <Project Path="production/SDL.Interop/SDL.Interop.csproj" />
     <Project Path="production/SDL.Native/SDL.Native.csproj" />
     <Project Path="production/Templates/Templates.csproj" />
   </Folder>
