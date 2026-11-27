@@ -1,0 +1,83 @@
+<!--
+  Package bottlenoselabs.SDL.Native: the native SDL library for every platform, at runtimes/<runtime identifier>/native/, where .NET
+  picks the one for the platform an app runs or is published for. Built by ext/build-sdl.sh into lib/<runtime identifier>/.
+
+  Libraries missing from lib/ are left out (a computer can only build its own platform), and the package is skipped when none are
+  built. Set RequireSdlNativeLibraries to true, as releases do, to fail unless all six are there.
+-->
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <DebugType>none</DebugType>
+    <NoWarn>$(NoWarn);NU5128</NoWarn> <!-- No lib/ folder, on purpose: native libraries only -->
+    <!-- The package holds SDL, so it carries SDL's license, not this repository's -->
+    <PackageLicenseExpression>Zlib</PackageLicenseExpression>
+    <PackageTags>SDL;SDL3;native</PackageTags>
+    <!-- This package's own readme, not the repository's -->
+    <_UseRepositoryPackageReadme>false</_UseRepositoryPackageReadme>
+    <_LibraryDirectory>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../../../lib'))</_LibraryDirectory>
+    <_SdlSourcePath>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../../../ext/SDL'))</_SdlSourcePath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <SdlNativeLibrary Include="win-x64" LibraryFileName="SDL3.dll" />
+    <SdlNativeLibrary Include="win-arm64" LibraryFileName="SDL3.dll" />
+    <SdlNativeLibrary Include="osx-x64" LibraryFileName="libSDL3.dylib" />
+    <SdlNativeLibrary Include="osx-arm64" LibraryFileName="libSDL3.dylib" />
+    <SdlNativeLibrary Include="linux-x64" LibraryFileName="libSDL3.so" />
+    <SdlNativeLibrary Include="linux-arm64" LibraryFileName="libSDL3.so" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <!-- Properties are evaluated before items, so check the files directly: packable when at least one library is built -->
+    <IsPackable Condition=" Exists('$(_LibraryDirectory)/win-x64/SDL3.dll') OR Exists('$(_LibraryDirectory)/win-arm64/SDL3.dll') OR Exists('$(_LibraryDirectory)/osx-x64/libSDL3.dylib') OR Exists('$(_LibraryDirectory)/osx-arm64/libSDL3.dylib') OR Exists('$(_LibraryDirectory)/linux-x64/libSDL3.so') OR Exists('$(_LibraryDirectory)/linux-arm64/libSDL3.so') ">true</IsPackable>
+  </PropertyGroup>
+
+  <!-- The SDL version, read from the submodule's SDL_version.h, for the package description -->
+  <PropertyGroup Condition=" Exists('$(_SdlSourcePath)/include/SDL3/SDL_version.h') ">
+    <_SdlVersionHeader>$([System.IO.File]::ReadAllText('$(_SdlSourcePath)/include/SDL3/SDL_version.h'))</_SdlVersionHeader>
+    <_SdlMajorVersion>$([System.Text.RegularExpressions.Regex]::Replace($([System.Text.RegularExpressions.Regex]::Match($(_SdlVersionHeader), 'define SDL_MAJOR_VERSION\s+\d+').Value), '[^0-9]', ''))</_SdlMajorVersion>
+    <_SdlMinorVersion>$([System.Text.RegularExpressions.Regex]::Replace($([System.Text.RegularExpressions.Regex]::Match($(_SdlVersionHeader), 'define SDL_MINOR_VERSION\s+\d+').Value), '[^0-9]', ''))</_SdlMinorVersion>
+    <_SdlMicroVersion>$([System.Text.RegularExpressions.Regex]::Replace($([System.Text.RegularExpressions.Regex]::Match($(_SdlVersionHeader), 'define SDL_MICRO_VERSION\s+\d+').Value), '[^0-9]', ''))</_SdlMicroVersion>
+    <SdlVersion>$(_SdlMajorVersion).$(_SdlMinorVersion).$(_SdlMicroVersion)</SdlVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageDescription>The native SDL $(SdlVersion) library for Windows, macOS and Linux (x64 and Arm64). Built from https://github.com/libsdl-org/SDL by https://github.com/bottlenoselabs/sdk.</PackageDescription>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" '$(IsPackable)' == 'true' ">
+    <None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="README.md" />
+    <None Include="$(_SdlSourcePath)/LICENSE.txt" Pack="true" PackagePath="SDL-LICENSE.txt" Condition=" Exists('$(_SdlSourcePath)/LICENSE.txt') " />
+  </ItemGroup>
+
+  <!-- Which libraries are built; in a target, because item conditions on file paths aren't allowed during evaluation -->
+  <Target Name="_FindSdlNativeLibraries">
+    <ItemGroup>
+      <_SdlNativeLibraryFile Include="@(SdlNativeLibrary->'$(_LibraryDirectory)/%(Identity)/%(LibraryFileName)')" RuntimeIdentifier="%(Identity)" />
+      <_SdlNativeLibraryFileFound Include="@(_SdlNativeLibraryFile)" Condition=" Exists('%(Identity)') " />
+      <_SdlNativeLibraryFileMissing Include="@(_SdlNativeLibraryFile)" Condition=" !Exists('%(Identity)') " />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="_PackSdlNativeLibraries" BeforeTargets="_GetPackageFiles" DependsOnTargets="_FindSdlNativeLibraries" Condition=" '$(IsPackable)' == 'true' ">
+    <Error Condition=" '$(RequireSdlNativeLibraries)' == 'true' AND '@(_SdlNativeLibraryFileMissing)' != '' " Text="Missing native SDL libraries: @(_SdlNativeLibraryFileMissing->'%(RuntimeIdentifier)', ', '). Build each with ext/build-sdl.sh &lt;runtime identifier&gt; on its operating system." />
+    <Message Condition=" '@(_SdlNativeLibraryFileMissing)' != '' " Importance="high" Text="$(MSBuildProjectName): packing without @(_SdlNativeLibraryFileMissing->'%(RuntimeIdentifier)', ', '), which aren't built in lib/" />
+    <ItemGroup>
+      <None Include="@(_SdlNativeLibraryFileFound)" Pack="true" PackagePath="runtimes/%(_SdlNativeLibraryFileFound.RuntimeIdentifier)/native/" />
+    </ItemGroup>
+  </Target>
+
+  <!-- None built at all: skip the package, or fail when all are required -->
+  <Target Name="_ReportNoSdlNativeLibraries" BeforeTargets="Pack;Build" Condition=" '$(IsPackable)' != 'true' ">
+    <Error Condition=" '$(RequireSdlNativeLibraries)' == 'true' " Text="No native SDL libraries in lib/. Build each with ext/build-sdl.sh &lt;runtime identifier&gt; on its operating system." />
+    <Message Condition=" '$(RequireSdlNativeLibraries)' != 'true' " Importance="high" Text="$(MSBuildProjectName): skipped, no native SDL library in lib/; build one with ext/build-sdl.sh" />
+  </Target>
+
+</Project>

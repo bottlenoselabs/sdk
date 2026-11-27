@@ -27,7 +27,7 @@ src/cs/
     Sdk.WebApp/Sdk/      The entry points for bottlenoselabs.Sdk.WebApp
     Sdk.GameApp/Sdk/     The entry points for bottlenoselabs.Sdk.GameApp
     SdkPackage.targets   How the three SDK packages are packed
-    SDL.Native.<rid>/    bottlenoselabs.SDL.Native.<rid>: the native SDL library for each platform (SdlNativePackage.targets)
+    SDL.Native/          bottlenoselabs.SDL.Native: the native SDL library for every platform
     Templates/           bottlenoselabs.Templates: the bl-game, bl-webapp and bl-lib templates
   tests/Consumers/       Test projects that use the packed SDKs, and test.sh
 docs/                    Documentation
@@ -96,7 +96,7 @@ SDL's C source is in the `ext/SDL` submodule, pinned to an SDL release. You only
 git submodule update --init --depth 1 ext/SDL
 ```
 
-Build the native library for your computer with `ext/build-sdl.sh`. It writes `lib/<runtime identifier>/` (for example `lib/osx-arm64/libSDL3.dylib`), which the `SDL.Native.<rid>` projects pack. Projects for platforms you haven't built are skipped. You need CMake and a C compiler; on Linux, also [SDL's development packages](https://wiki.libsdl.org/SDL3/README-linux).
+Build the native library for your computer with `ext/build-sdl.sh`. It writes `lib/<runtime identifier>/` (for example `lib/osx-arm64/libSDL3.dylib`), which `SDL.Native` packs as `runtimes/<runtime identifier>/native/`. Platforms you haven't built are left out of a local package. You need CMake and a C compiler; on Linux, also [SDL's development packages](https://wiki.libsdl.org/SDL3/README-linux).
 
 In CI, `.github/workflows/sdl-native.yml` builds all six platforms. Each build is cached by the SDL commit and the build script, so SDL is only rebuilt when one of them changes.
 

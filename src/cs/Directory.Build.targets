@@ -5,7 +5,7 @@
   <!-- Package icon and readme of this repository's packages -->
   <ItemGroup Condition=" '$(IsPackable)' == 'true' ">
     <None Include="$(MSBuildThisFileDirectory)icon.png" Pack="true" PackagePath="" Visible="false" />
-    <None Include="$(MSBuildThisFileDirectory)PACKAGE-README.md" Pack="true" PackagePath="README.md" Visible="false" />
+    <None Include="$(MSBuildThisFileDirectory)PACKAGE-README.md" Pack="true" PackagePath="README.md" Visible="false" Condition=" '$(_UseRepositoryPackageReadme)' != 'false' " />
   </ItemGroup>
 
 </Project>
