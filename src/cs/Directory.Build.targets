@@ -2,9 +2,10 @@
 
   <Import Project="$(MSBuildThisFileDirectory)production/Sdk/Sdk.targets" />
 
-  <!-- Package icon of this repository's packages -->
+  <!-- Package icon and readme of this repository's packages -->
   <ItemGroup Condition=" '$(IsPackable)' == 'true' ">
     <None Include="$(MSBuildThisFileDirectory)icon.png" Pack="true" PackagePath="" Visible="false" />
+    <None Include="$(MSBuildThisFileDirectory)PACKAGE-README.md" Pack="true" PackagePath="README.md" Visible="false" />
   </ItemGroup>
 
 </Project>
