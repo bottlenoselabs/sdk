@@ -39,12 +39,21 @@ All build output goes to one `artifacts/` folder, in `bin/`, `obj/` and `publish
 
 | Property | Default |
 | --- | --- |
-| `Company`, `Authors` | `bottlenoselabs` |
-| `Copyright` | `© <current year> Bottlenose Labs Inc.` |
 | `Version` | `0.0.0.0-pre` when not set |
 | `NeutralLanguage` | `en` |
 
-These describe Bottlenose Labs projects. If you use the SDK for your own projects, set them in your `Directory.Build.props`.
+The SDKs don't set who a project belongs to: `Company`, `Authors`, `Copyright`, the package ID prefix and the package icon are yours to set. Put them in a `Directory.Build.props` at the root of your repository:
+
+```xml
+<Project>
+  <PropertyGroup>
+    <Company>Acme</Company>
+    <Authors>Acme</Authors>
+    <Copyright>© Acme Inc.</Copyright>
+    <PackageIdPrefix>acme.</PackageIdPrefix>
+  </PropertyGroup>
+</Project>
+```
 
 ### C#
 
@@ -94,14 +103,14 @@ Properties that describe the computer doing the build, for use in your own condi
 | `AnalysisMode`, `AnalysisLevel` | `all`, `latest`: every .NET analyzer rule |
 | `TreatWarningsAsErrors` | `true` |
 
-The code style rules are in [`BottlenoseLabs.globalconfig`](../src/cs/production/Sdk/CodeAnalysis/BottlenoseLabs.globalconfig). They follow StyleCop's conventions using the analyzers built into .NET, so StyleCop isn't needed. That includes a required file header on every C# file:
+The code style rules are in [`CodeAnalysis.globalconfig`](../src/cs/production/Sdk/CodeAnalysis/CodeAnalysis.globalconfig). They follow StyleCop's conventions using the analyzers built into .NET, so StyleCop isn't needed.
 
-```csharp
-// Copyright (c) Bottlenose Labs Inc. (https://github.com/bottlenoselabs). All rights reserved.
-// Licensed under the MIT license. See LICENSE file in the Git repository root directory for full license information.
+To require a header, such as a copyright notice, at the top of every C# file, set `file_header_template` in your `.editorconfig`. Files without it then fail the build:
+
+```ini
+[*.cs]
+file_header_template = Copyright (c) Acme Inc. All rights reserved.
 ```
-
-To use your own header, set `file_header_template` in your `.editorconfig`.
 
 ### Code coverage
 
@@ -115,8 +124,7 @@ To use your own header, set `file_header_template` in your `.editorconfig`.
 | --- | --- |
 | `IsPackable` | `false`. Set to `true` in projects you publish as packages |
 | `PackageOutputPath` | `<Git repository root>/nupkg`, or `nupkg` next to the project outside a Git repository |
-| `PackageId` | `bottlenoselabs.<AssemblyName>` when not set |
-| `PackageIcon` | The Bottlenose Labs logo when not set |
+| `PackageIdPrefix` | Not set. Set it, for example to `acme.`, to make every package ID that isn't set explicitly `acme.<AssemblyName>` |
 | `RepositoryType` | `git` |
 
 ## bottlenoselabs.Sdk.WebApp
@@ -141,7 +149,7 @@ Wraps `Microsoft.NET.Sdk`. See [Games](games.md).
 | `ApplicationManifest` | A Windows manifest: per-monitor DPI awareness, long paths, UTF-8 |
 | `IsEnabledPlatformPackaging` | `true`: publishing makes `MyGame.app` on macOS and `MyGame.AppDir` on Linux |
 | `GameAppDisplayName` | `$(Product)` |
-| `GameAppBundleIdentifier` | `com.<company>.<assembly name>`, in lowercase |
+| `GameAppBundleIdentifier` | `com.<company>.<assembly name>` in lowercase, or `com.<assembly name>` when `Company` is not set |
 | `GameAppMinimumMacOSVersion` | `15.0` |
 | `IsEnabledPublishDebugSymbols` | Not set: debug symbols are left out of the published game. Set to `true` to publish them |
 | `IsEnabledRuntimeMarshalling` | Not set: the assembly has `[DisableRuntimeMarshalling]`. Set to `true` to turn runtime marshalling back on |

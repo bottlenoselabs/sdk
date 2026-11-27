@@ -4,7 +4,7 @@
     <TargetFramework>DOTNET_TARGET_FRAMEWORK</TargetFramework>
   </PropertyGroup>
 
-  <!-- NuGet: the package ID is bottlenoselabs.MyLibrary -->
+  <!-- NuGet: the package ID is MyLibrary; set PackageId, or PackageIdPrefix in a Directory.Build.props, to change it -->
   <PropertyGroup>
     <IsPackable>true</IsPackable>
     <PackageDescription>TODO: describe MyLibrary.</PackageDescription>

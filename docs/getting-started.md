@@ -1,6 +1,6 @@
 # Getting started
 
-This guide gets you from nothing to a running project on a Bottlenose Labs SDK. It assumes you know C# and the `dotnet` command line, but not MSBuild SDKs.
+This guide gets you from nothing to a running project on one of these SDKs. It assumes you know C# and the `dotnet` command line, but not MSBuild SDKs.
 
 > [!NOTE]
 > The packages are not on NuGet.org yet. Until the first release, replace `<version>` below with a version from [Releases](https://github.com/bottlenoselabs/sdk/releases), or build them yourself: see [CONTRIBUTING.md](../CONTRIBUTING.md#testing).

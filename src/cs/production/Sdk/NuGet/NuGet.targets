@@ -1,22 +1,8 @@
 <Project>
 
-  <!-- NuGet -->
-  <PropertyGroup Condition=" '$(PackageId)' == '' ">
-    <PackageId>$(Company).$(AssemblyName)</PackageId>
+  <!-- Package ID: set PackageIdPrefix (for example `acme.`) to prefix every package ID that isn't set explicitly -->
+  <PropertyGroup Condition=" '$(PackageIdPrefix)' != '' AND ('$(PackageId)' == '' OR '$(PackageId)' == '$(AssemblyName)') ">
+    <PackageId>$(PackageIdPrefix)$(AssemblyName)</PackageId>
   </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(PackageIcon)' == '' AND '$(_IsPackageIconSet)' == '' ">
-    <PackageIcon>icon.png</PackageIcon>
-    <PackageIconUrl>https://github.com/bottlenoselabs/.github/blob/6acba5c53d945264b21233a79fbd5b1c3560891e/images/png/logo_padded.png</PackageIconUrl>
-    <NoWarn>$(NoWarn);NU5048</NoWarn>
-    <_IsPackageIconSet>true</_IsPackageIconSet>
-  </PropertyGroup>
-  <ItemGroup Condition=" '$(_IsPackageIconSet)' != '' ">
-    <Content Include="$(_BottlenoseLabsSdkContentDirectoryPath)/icon.png">
-      <Pack>true</Pack>
-      <PackagePath>icon.png</PackagePath>
-      <Link>Properties/bottlenoselabs/icon.png</Link>
-    </Content>
-  </ItemGroup>
 
 </Project>

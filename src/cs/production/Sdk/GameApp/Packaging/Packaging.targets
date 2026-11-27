@@ -15,8 +15,10 @@
     <GameAppIcon>$([System.IO.Path]::GetFullPath('$(GameAppIcon)'))</GameAppIcon>
     <!-- Name people see, for example in the macOS menu bar and Linux app menus -->
     <GameAppDisplayName Condition=" '$(GameAppDisplayName)' == '' ">$(Product)</GameAppDisplayName>
-    <!-- macOS bundle identifier: reverse-DNS, letters, digits, '.' and '-' only -->
-    <GameAppBundleIdentifier Condition=" '$(GameAppBundleIdentifier)' == '' ">$([System.Text.RegularExpressions.Regex]::Replace('com.$(Company).$(AssemblyName)', '[^A-Za-z0-9.-]', '-').ToLowerInvariant())</GameAppBundleIdentifier>
+    <!-- macOS bundle identifier: reverse-DNS, letters, digits, '.' and '-' only. com.<company>.<name>, or com.<name> when Company is
+         not set (.NET then defaults it to the assembly name) -->
+    <_GameAppBundleIdentifierCompany Condition=" '$(Company)' != '' AND '$(Company)' != '$(AssemblyName)' ">$(Company).</_GameAppBundleIdentifierCompany>
+    <GameAppBundleIdentifier Condition=" '$(GameAppBundleIdentifier)' == '' ">$([System.Text.RegularExpressions.Regex]::Replace('com.$(_GameAppBundleIdentifierCompany)$(AssemblyName)', '[^A-Za-z0-9.-]', '-').ToLowerInvariant())</GameAppBundleIdentifier>
     <!-- macOS wants a plain number version: drop any pre-release suffix (2026.11.27-rc becomes 2026.11.27) -->
     <_GameAppBundleVersion>$([System.Text.RegularExpressions.Regex]::Replace('$(Version)', '-.*$', ''))</_GameAppBundleVersion>
     <_GameAppPackagingDirectory>$(_BottlenoseLabsSdkContentDirectoryPath)/GameApp/Packaging</_GameAppPackagingDirectory>

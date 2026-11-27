@@ -18,7 +18,7 @@
 
   <!-- Analyzer and code style rules -->
   <ItemGroup Condition=" '$(IsEnabledAnalyzers)' == 'true' ">
-    <GlobalAnalyzerConfigFiles Include="$(MSBuildThisFileDirectory)BottlenoseLabs.globalconfig" Link="Properties/BottlenoseLabs.globalconfig" />
+    <GlobalAnalyzerConfigFiles Include="$(MSBuildThisFileDirectory)CodeAnalysis.globalconfig" Link="Properties/CodeAnalysis.globalconfig" />
   </ItemGroup>
 
 </Project>

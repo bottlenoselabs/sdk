@@ -6,4 +6,13 @@
   </PropertyGroup>
   <Import Project="$(_BottlenoseLabsSdkContentDirectoryPath)/Sdk.props" />
 
+  <!-- Identity of this repository's packages. The SDKs set none of this for other projects -->
+  <PropertyGroup>
+    <Company>bottlenoselabs</Company>
+    <Authors>bottlenoselabs</Authors>
+    <Copyright>© $([System.DateTime]::Now.ToString(yyyy)) Bottlenose Labs Inc.</Copyright>
+    <PackageIdPrefix>bottlenoselabs.</PackageIdPrefix>
+    <PackageIcon>icon.png</PackageIcon>
+  </PropertyGroup>
+
 </Project>

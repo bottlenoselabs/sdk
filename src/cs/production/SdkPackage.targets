@@ -19,7 +19,7 @@
     <!-- Entry points that MSBuild finds by the package name: this project's own Sdk/ folder -->
     <None Include="$(MSBuildProjectDirectory)/Sdk/Sdk.props;$(MSBuildProjectDirectory)/Sdk/Sdk.targets" Pack="true" PackagePath="Sdk/" />
     <!-- Shared content the entry points import -->
-    <None Include="$(MSBuildThisFileDirectory)Sdk/**/*.props;$(MSBuildThisFileDirectory)Sdk/**/*.targets;$(MSBuildThisFileDirectory)Sdk/**/*.globalconfig;$(MSBuildThisFileDirectory)Sdk/icon.png;$(MSBuildThisFileDirectory)Sdk/**/*.manifest;$(MSBuildThisFileDirectory)Sdk/**/*.ps1;$(MSBuildThisFileDirectory)Sdk/**/*.sh;$(MSBuildThisFileDirectory)Sdk/**/DefaultIcon.png"
+    <None Include="$(MSBuildThisFileDirectory)Sdk/**/*.props;$(MSBuildThisFileDirectory)Sdk/**/*.targets;$(MSBuildThisFileDirectory)Sdk/**/*.globalconfig;$(MSBuildThisFileDirectory)Sdk/**/*.manifest;$(MSBuildThisFileDirectory)Sdk/**/*.ps1;$(MSBuildThisFileDirectory)Sdk/**/*.sh;$(MSBuildThisFileDirectory)Sdk/**/DefaultIcon.png"
           Exclude="$(MSBuildThisFileDirectory)Sdk/Sdk/**;$(MSBuildThisFileDirectory)Sdk/bin/**;$(MSBuildThisFileDirectory)Sdk/obj/**"
           Pack="true" PackagePath="content/" Visible="false" />
   </ItemGroup>
