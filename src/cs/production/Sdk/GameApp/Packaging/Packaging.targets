@@ -9,9 +9,9 @@
   -->
 
   <PropertyGroup>
-    <!-- Icon: icon.png next to the project file, or the Bottlenose Labs logo. Any square size; 1024x1024 or larger looks best -->
+    <!-- Icon: icon.png next to the project file, or a neutral game controller icon. Any square size; 1024x1024 or larger looks best -->
     <GameAppIcon Condition=" '$(GameAppIcon)' == '' AND Exists('$(MSBuildProjectDirectory)/icon.png') ">$(MSBuildProjectDirectory)/icon.png</GameAppIcon>
-    <GameAppIcon Condition=" '$(GameAppIcon)' == '' ">$(_BottlenoseLabsSdkContentDirectoryPath)/icon.png</GameAppIcon>
+    <GameAppIcon Condition=" '$(GameAppIcon)' == '' ">$(_BottlenoseLabsSdkContentDirectoryPath)/GameApp/Packaging/DefaultIcon.png</GameAppIcon>
     <GameAppIcon>$([System.IO.Path]::GetFullPath('$(GameAppIcon)'))</GameAppIcon>
     <!-- Name people see, for example in the macOS menu bar and Linux app menus -->
     <GameAppDisplayName Condition=" '$(GameAppDisplayName)' == '' ">$(Product)</GameAppDisplayName>
