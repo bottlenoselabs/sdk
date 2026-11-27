@@ -48,7 +48,13 @@
     <Error Condition=" '$(TieredCompilation)' == 'false' " Text="TieredCompilation is 'false'; the runtime default is expected." />
 
     <!-- Project defaults -->
-    <Error Condition=" '$(Company)' != 'bottlenoselabs' " Text="Company is '$(Company)', expected 'bottlenoselabs'." />
+    <!-- No Bottlenose Labs identity on other people's projects -->
+    <Error Condition=" $(Company.ToLowerInvariant().Contains('bottlenose')) " Text="Company is '$(Company)'; the SDK must not set it." />
+    <Error Condition=" $(Authors.ToLowerInvariant().Contains('bottlenose')) " Text="Authors is '$(Authors)'; the SDK must not set it." />
+    <Error Condition=" $(Copyright.ToLowerInvariant().Contains('bottlenose')) " Text="Copyright is '$(Copyright)'; the SDK must not set it." />
+    <Error Condition=" $(PackageId.ToLowerInvariant().Contains('bottlenose')) " Text="PackageId is '$(PackageId)'; the SDK must not prefix it." />
+    <Error Condition=" '$(PackageIcon)' != '' " Text="PackageIcon is '$(PackageIcon)'; the SDK must not set it." />
+    <Error Condition=" '$(GameAppBundleIdentifier)' != '' AND $(GameAppBundleIdentifier.Contains('bottlenose')) " Text="GameAppBundleIdentifier is '$(GameAppBundleIdentifier)'; it must not name Bottlenose Labs." />
     <Error Condition=" '$(Nullable)' != 'enable' " Text="Nullable is '$(Nullable)', expected 'enable'." />
     <Error Condition=" '$(TreatWarningsAsErrors)' != 'true' " Text="TreatWarningsAsErrors is '$(TreatWarningsAsErrors)', expected 'true'." />
 

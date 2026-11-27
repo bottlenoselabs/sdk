@@ -99,7 +99,7 @@ You can change these values:
 | Property | Default |
 | --- | --- |
 | `GameAppDisplayName` | The project's `Product`, which is the assembly name unless you set it |
-| `GameAppBundleIdentifier` | `com.<company>.<assembly name>`, in lowercase |
+| `GameAppBundleIdentifier` | `com.<company>.<assembly name>` in lowercase, or `com.<assembly name>` when `Company` is not set |
 | `GameAppMinimumMacOSVersion` | `15.0`, the oldest macOS that .NET 11 supports |
 | `Version` | The version shown in Finder, without any pre-release suffix |
 

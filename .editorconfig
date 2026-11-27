@@ -52,4 +52,7 @@ indent_style = tab
 # C# Files
 [*.cs]
 insert_final_newline = true
-# Analyzer and code style rules are in `CodeAnalysis/BottlenoseLabs.globalconfig`
+# Analyzer and code style rules are in `src/cs/production/Sdk/CodeAnalysis/CodeAnalysis.globalconfig`
+
+# File header required on every C# file in this repository
+file_header_template = Copyright (c) Bottlenose Labs Inc. (https://github.com/bottlenoselabs). All rights reserved.\nLicensed under the MIT license. See LICENSE file in the Git repository root directory for full license information.

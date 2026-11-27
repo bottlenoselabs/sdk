@@ -1,6 +1,6 @@
 # MyLibrary
 
-A C# library on [`bottlenoselabs.Sdk`](https://github.com/bottlenoselabs/sdk), published to NuGet.org as `bottlenoselabs.MyLibrary`.
+A C# library on [`bottlenoselabs.Sdk`](https://github.com/bottlenoselabs/sdk), published to NuGet.org as `MyLibrary`.
 
 ## Develop
 

@@ -62,6 +62,8 @@ In the early targets, only set a property when it's empty (`Condition=" '$(Publi
 
 Every package carries a copy of the whole `Sdk/` folder as `content/`, so a project only needs the one package it uses. This repository's own projects use `Microsoft.NET.Sdk` and import the shared files directly through `src/cs/Directory.Build.props`.
 
+The SDKs must never put Bottlenose Labs' name on other people's projects: no company, authors, copyright, package ID prefix, icon or file header by default. This repository sets its own identity in `src/cs/Directory.Build.props` and `.editorconfig`, the same way any other organization would. The tests fail if that identity leaks into a consumer project or into a repository created from a template.
+
 ## Testing
 
 ```bash

@@ -52,4 +52,6 @@ indent_style = tab
 # C# Files
 [*.cs]
 insert_final_newline = true
-# Analyzer and code style rules are in `CodeAnalysis/BottlenoseLabs.globalconfig`
+# Analyzer and code style rules come from the bottlenoselabs.Sdk packages; change a rule's severity here, for example:
+# dotnet_diagnostic.CA1515.severity = suggestion
+# To require a header on every C# file, set `file_header_template`

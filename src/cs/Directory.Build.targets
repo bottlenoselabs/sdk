@@ -1,5 +1,10 @@
 <Project>
 
-    <Import Project="$(MSBuildThisFileDirectory)production/Sdk/Sdk.targets" />
+  <Import Project="$(MSBuildThisFileDirectory)production/Sdk/Sdk.targets" />
+
+  <!-- Package icon of this repository's packages -->
+  <ItemGroup Condition=" '$(IsPackable)' == 'true' ">
+    <None Include="$(MSBuildThisFileDirectory)icon.png" Pack="true" PackagePath="" Visible="false" />
+  </ItemGroup>
 
 </Project>

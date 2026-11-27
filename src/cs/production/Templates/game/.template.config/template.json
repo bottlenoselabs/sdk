@@ -6,7 +6,7 @@
     "Console"
   ],
   "identity": "bottlenoselabs.Templates.GameApp",
-  "name": "Bottlenose Labs game",
+  "name": "Game (bottlenoselabs.Sdk.GameApp)",
   "description": "A repository for a C# game on bottlenoselabs.Sdk.GameApp: NativeAOT in Release, an Assets folder, and CI that publishes the game per platform.",
   "shortName": "bl-game",
   "sourceName": "MyGame",

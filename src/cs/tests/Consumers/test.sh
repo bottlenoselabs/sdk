@@ -114,6 +114,15 @@ for pair in bl-game:TestGame bl-webapp:TestWebApp bl-lib:TestLibrary; do
 </configuration>
 EOF
 
+    # The new repository must not claim to be Bottlenose Labs' work. It may only name the SDK packages, this repository and SDL3-cs
+    leaks="$(grep -rniE "bottlenose" "$repo" --exclude=nuget.config \
+        | grep -viE "bottlenoselabs\.Sdk|bottlenoselabs/sdk|bottlenoselabs/SDL3-cs" || true)"
+    if [[ -n "$leaks" ]]; then
+        echo "The $template template generates Bottlenose Labs identity:" >&2
+        echo "$leaks" >&2
+        exit 1
+    fi
+
     (cd "$repo" && dotnet build --disable-build-servers ./src/cs --nologo --configuration Debug)
     (cd "$repo" && dotnet build --disable-build-servers ./src/cs --nologo --configuration Release)
 done

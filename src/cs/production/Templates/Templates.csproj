@@ -4,7 +4,7 @@
   <PropertyGroup>
     <TargetFramework>net11.0</TargetFramework>
     <PackageType>Template</PackageType>
-    <PackageDescription>`dotnet new` templates for Bottlenose Labs repositories: bl-game, bl-webapp and bl-lib.</PackageDescription>
+    <PackageDescription>`dotnet new` templates for repositories on the bottlenoselabs.Sdk MSBuild SDKs: bl-game, bl-webapp and bl-lib.</PackageDescription>
     <PackageTags>dotnet-new;templates;game;webapp;library</PackageTags>
     <RepositoryUrl>https://github.com/bottlenoselabs/sdk</RepositoryUrl>
     <IsPackable>true</IsPackable>

@@ -5,7 +5,7 @@
     "Library"
   ],
   "identity": "bottlenoselabs.Templates.Library",
-  "name": "Bottlenose Labs library",
+  "name": "Library (bottlenoselabs.Sdk)",
   "description": "A repository for a C# library on bottlenoselabs.Sdk, published to NuGet.org with trusted publishing.",
   "shortName": "bl-lib",
   "sourceName": "MyLibrary",

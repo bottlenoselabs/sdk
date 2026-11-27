@@ -19,9 +19,6 @@
 
   <!-- MSBuild project settings -->
   <PropertyGroup>
-    <Company>bottlenoselabs</Company>
-    <Authors>bottlenoselabs</Authors>
-    <Copyright>© $([System.DateTime]::Now.ToString(yyyy)) Bottlenose Labs Inc.</Copyright>
     <NeutralLanguage>en</NeutralLanguage>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
