@@ -1,0 +1,11 @@
+{
+  "sdk": {
+    "version": "DOTNET_SDK_VERSION",
+    "rollForward": "latestFeature"
+  },
+  "msbuild-sdks": {
+    "bottlenoselabs.Sdk": "BOTTLENOSELABS_SDK_VERSION",
+    "bottlenoselabs.Sdk.WebApp": "BOTTLENOSELABS_SDK_VERSION",
+    "bottlenoselabs.Sdk.GameApp": "BOTTLENOSELABS_SDK_VERSION"
+  }
+}

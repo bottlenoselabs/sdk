@@ -1,0 +1,25 @@
+name: "Main"
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - "main"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.ref }}"
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+
+  build-job:
+    name: "Build"
+    uses: "bottlenoselabs/sdk/.github/workflows/cs-build.yml@vBOTTLENOSELABS_SDK_VERSION"
+    with:
+      path: "./src/cs"
+      # Set to true once the solution has test projects
+      test: false

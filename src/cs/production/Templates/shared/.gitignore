@@ -1,0 +1,9 @@
+# Build output (bottlenoselabs.Sdk puts everything under the repository root)
+/artifacts/
+/nupkg/
+
+# IDEs and operating systems
+.idea/
+.vs/
+*.user
+.DS_Store

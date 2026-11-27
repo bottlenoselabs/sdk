@@ -1,0 +1,46 @@
+name: "Release"
+
+on:
+  workflow_dispatch:
+    inputs:
+      pre-release:
+        description: "Is pre-release? A default version gets an `-rc` suffix; a custom version must include its own pre-release suffix, for example `1.0.0-rc.1`."
+        type: boolean
+        required: true
+        default: true
+      version:
+        description: "Version; if blank, the current date is used"
+        type: string
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "${{ github.workflow }}"
+  cancel-in-progress: false
+
+jobs:
+
+  build-job:
+    name: "Build"
+    uses: "bottlenoselabs/sdk/.github/workflows/cs-build.yml@vBOTTLENOSELABS_SDK_VERSION"
+    with:
+      path: "./src/cs"
+      # Set to true once the solution has test projects
+      test: false
+
+  release-job:
+    name: "Release"
+    needs: [build-job]
+    uses: "bottlenoselabs/sdk/.github/workflows/cs-release.yml@vBOTTLENOSELABS_SDK_VERSION"
+    permissions:
+      contents: write
+      id-token: write
+    with:
+      path: "./src/cs"
+      pre-release: ${{ inputs.pre-release }}
+      version: ${{ inputs.version }}
+    secrets:
+      NUGET_USER: ${{ secrets.NUGET_USER }}

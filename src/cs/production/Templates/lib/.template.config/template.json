@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "Bottlenose Labs",
+  "classifications": [
+    "Library"
+  ],
+  "identity": "bottlenoselabs.Templates.Library",
+  "name": "Bottlenose Labs library",
+  "description": "A repository for a C# library on bottlenoselabs.Sdk, published to NuGet.org with trusted publishing.",
+  "shortName": "bl-lib",
+  "sourceName": "MyLibrary",
+  "preferNameDirectory": true,
+  "tags": {
+    "language": "C#",
+    "type": "solution"
+  }
+}
