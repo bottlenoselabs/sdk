@@ -1,0 +1,127 @@
+# Composite action: pack NuGet packages, push them to NuGet.org with trusted publishing, and create a tagged GitHub release.
+#
+# Why an action and not a reusable workflow: NuGet.org matches the trusted publishing policy against the workflow that contains the
+# job doing the login (the `job_workflow_ref` claim). An action runs as steps inside the caller's own job, so the policy names the
+# caller's workflow file, for example `release.yml`, in the caller's repository. A reusable workflow in this repository could never
+# match a policy for another repository. See https://github.com/NuGet/NuGetGallery/issues/11000.
+#
+# Usage, in a job that grants `contents: write` and `id-token: write`:
+#
+#   steps:
+#     - uses: bottlenoselabs/sdk/.github/actions/cs-release@<tag>
+#       with:
+#         path: ./src/cs
+#         pre-release: ${{ inputs.pre-release }}
+#         version: ${{ inputs.version }}
+#         nuget-user: ${{ secrets.NUGET_USER }}
+
+name: "C# release"
+description: "Pack NuGet packages, push them to NuGet.org with trusted publishing, and create a tagged GitHub release"
+
+inputs:
+  path:
+    description: "Solution, project, or directory to pack"
+    default: "."
+  global-json-file:
+    description: "global.json that pins the .NET SDK version"
+    default: "global.json"
+  pre-release:
+    description: "`true` for a pre-release. A generated version gets an `-rc` suffix; a custom version must include its own pre-release suffix, for example `1.0.0-rc.1`"
+    default: "true"
+  version:
+    description: "Version; if blank, the current date is used, for example `2026.11.27`"
+    default: ""
+  nuget-user:
+    description: "NuGet.org user name that created the trusted publishing policy. Required unless `push` is `false`"
+    default: ""
+  push:
+    description: "`false` to only pack, without pushing to NuGet.org or creating a release; for testing"
+    default: "true"
+  github-token:
+    description: "Token to create the tag and GitHub release with"
+    default: ${{ github.token }}
+
+outputs:
+  version:
+    description: "The released version"
+    value: ${{ steps.set-version.outputs.VERSION }}
+
+runs:
+  using: "composite"
+  steps:
+
+    - name: "Only release from the default branch"
+      # NuGet.org packages are permanent, so only release reviewed code
+      if: ${{ inputs.push == 'true' }}
+      shell: bash
+      env:
+        DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+      run: |
+        if [[ "$GITHUB_REF" != "refs/heads/$DEFAULT_BRANCH" ]]; then
+          echo "::error::Releases run only from the default branch ($DEFAULT_BRANCH), not $GITHUB_REF"
+          exit 1
+        fi
+
+    - name: "Clone Git repository"
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+    - name: "Setup .NET"
+      uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+      with:
+        global-json-file: ${{ inputs.global-json-file }}
+
+    - name: "Set version"
+      id: set-version
+      shell: bash
+      env:
+        VERSION_INPUT: ${{ inputs.version }}
+        IS_PRERELEASE: ${{ inputs.pre-release }}
+      run: |
+        VERSION="$VERSION_INPUT"
+        if [[ -z "$VERSION" ]]; then
+          # Date without zero padding so the Git tag matches the version NuGet normalizes to
+          VERSION="$(date +'%Y.%-m.%-d')"
+          if [[ "$IS_PRERELEASE" = "true" ]]; then
+            VERSION="$VERSION-rc"
+          fi
+        fi
+        echo "VERSION=$VERSION"
+        echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
+
+    - name: ".NET pack"
+      shell: bash
+      env:
+        PACK_PATH: ${{ inputs.path }}
+        VERSION: ${{ steps.set-version.outputs.VERSION }}
+        BRANCH: ${{ github.ref_name }}
+        COMMIT: ${{ github.sha }}
+      run: |
+        rm -rf ./nupkg
+        dotnet pack "$PACK_PATH" --nologo --verbosity minimal --configuration Release \
+          -p:PackageVersion="$VERSION" -p:RepositoryBranch="$BRANCH" -p:RepositoryCommit="$COMMIT"
+        ls -1 ./nupkg/*.nupkg
+
+    - name: "Login to NuGet (trusted publishing)"
+      if: ${{ inputs.push == 'true' }}
+      id: nuget-login
+      uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
+      with:
+        user: ${{ inputs.nuget-user }}
+
+    - name: "Push packages to NuGet"
+      if: ${{ inputs.push == 'true' }}
+      shell: bash
+      env:
+        NUGET_API_KEY: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
+      run: dotnet nuget push "./nupkg/*.nupkg" --source https://api.nuget.org/v3/index.json --skip-duplicate --api-key "$NUGET_API_KEY"
+
+    - name: "Create tag and GitHub release"
+      if: ${{ inputs.push == 'true' }}
+      uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
+      with:
+        token: ${{ inputs.github-token }}
+        generate_release_notes: true
+        prerelease: ${{ inputs.pre-release == 'true' }}
+        tag_name: "v${{ steps.set-version.outputs.VERSION }}"
+        target_commitish: ${{ github.sha }}
+        files: "./nupkg/*.nupkg"
