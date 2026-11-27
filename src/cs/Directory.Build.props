@@ -13,6 +13,9 @@
     <Copyright>© $([System.DateTime]::Now.ToString(yyyy)) Bottlenose Labs Inc.</Copyright>
     <PackageIdPrefix>bottlenoselabs.</PackageIdPrefix>
     <PackageIcon>icon.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/bottlenoselabs/sdk</PackageProjectUrl>
   </PropertyGroup>
 
 </Project>
