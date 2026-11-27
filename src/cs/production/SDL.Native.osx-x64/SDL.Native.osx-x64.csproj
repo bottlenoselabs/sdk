@@ -1,0 +1,11 @@
+<!-- Package bottlenoselabs.SDL.Native.osx-x64: the native SDL library for osx-x64; see ../SdlNativePackage.targets -->
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <SdlNativeRuntimeIdentifier>osx-x64</SdlNativeRuntimeIdentifier>
+    <SdlNativeFileName>libSDL3.dylib</SdlNativeFileName>
+  </PropertyGroup>
+
+  <Import Project="../SdlNativePackage.targets" />
+
+</Project>

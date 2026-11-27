@@ -1,0 +1,11 @@
+<!-- Package bottlenoselabs.SDL.Native.linux-arm64: the native SDL library for linux-arm64; see ../SdlNativePackage.targets -->
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <SdlNativeRuntimeIdentifier>linux-arm64</SdlNativeRuntimeIdentifier>
+    <SdlNativeFileName>libSDL3.so</SdlNativeFileName>
+  </PropertyGroup>
+
+  <Import Project="../SdlNativePackage.targets" />
+
+</Project>

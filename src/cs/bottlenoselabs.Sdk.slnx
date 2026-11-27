@@ -5,4 +5,12 @@
     <Project Path="production/Sdk.WebApp/Sdk.WebApp.csproj" />
     <Project Path="production/Templates/Templates.csproj" />
   </Folder>
+  <Folder Name="/production/SDL.Native/">
+    <Project Path="production/SDL.Native.win-x64/SDL.Native.win-x64.csproj" />
+    <Project Path="production/SDL.Native.win-arm64/SDL.Native.win-arm64.csproj" />
+    <Project Path="production/SDL.Native.osx-x64/SDL.Native.osx-x64.csproj" />
+    <Project Path="production/SDL.Native.osx-arm64/SDL.Native.osx-arm64.csproj" />
+    <Project Path="production/SDL.Native.linux-x64/SDL.Native.linux-x64.csproj" />
+    <Project Path="production/SDL.Native.linux-arm64/SDL.Native.linux-arm64.csproj" />
+  </Folder>
 </Solution>

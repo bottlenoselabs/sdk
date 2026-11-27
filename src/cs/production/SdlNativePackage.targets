@@ -1,0 +1,53 @@
+<Project>
+
+  <!--
+    Shared by the bottlenoselabs.SDL.Native.<runtime identifier> package projects. Each package holds one native SDL library, built by
+    ext/build-sdl.sh into lib/<runtime identifier>/, at runtimes/<runtime identifier>/native/, where .NET finds it.
+    A project sets SdlNativeRuntimeIdentifier and SdlNativeFileName, then imports this file.
+
+    Without the library (for example on a computer that only built its own platform), the package is skipped. Set
+    RequireSdlNativeLibraries to true, as releases do, to fail instead.
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <DebugType>none</DebugType>
+    <NoWarn>$(NoWarn);NU5128</NoWarn> <!-- No lib/ folder, on purpose: native library only -->
+    <_SdlNativeLibraryPath>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../../lib/$(SdlNativeRuntimeIdentifier)/$(SdlNativeFileName)'))</_SdlNativeLibraryPath>
+    <_SdlSourcePath>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../../ext/SDL'))</_SdlSourcePath>
+    <IsPackable>false</IsPackable>
+    <IsPackable Condition=" Exists('$(_SdlNativeLibraryPath)') ">true</IsPackable>
+  </PropertyGroup>
+
+  <!-- The SDL version, read from the submodule's SDL_version.h, for the package description -->
+  <PropertyGroup Condition=" Exists('$(_SdlSourcePath)/include/SDL3/SDL_version.h') ">
+    <_SdlVersionHeader>$([System.IO.File]::ReadAllText('$(_SdlSourcePath)/include/SDL3/SDL_version.h'))</_SdlVersionHeader>
+    <_SdlMajorVersion>$([System.Text.RegularExpressions.Regex]::Replace($([System.Text.RegularExpressions.Regex]::Match($(_SdlVersionHeader), 'define SDL_MAJOR_VERSION\s+\d+').Value), '[^0-9]', ''))</_SdlMajorVersion>
+    <_SdlMinorVersion>$([System.Text.RegularExpressions.Regex]::Replace($([System.Text.RegularExpressions.Regex]::Match($(_SdlVersionHeader), 'define SDL_MINOR_VERSION\s+\d+').Value), '[^0-9]', ''))</_SdlMinorVersion>
+    <_SdlMicroVersion>$([System.Text.RegularExpressions.Regex]::Replace($([System.Text.RegularExpressions.Regex]::Match($(_SdlVersionHeader), 'define SDL_MICRO_VERSION\s+\d+').Value), '[^0-9]', ''))</_SdlMicroVersion>
+    <SdlVersion>$(_SdlMajorVersion).$(_SdlMinorVersion).$(_SdlMicroVersion)</SdlVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageDescription>The native SDL $(SdlVersion) library ($(SdlNativeFileName)) for $(SdlNativeRuntimeIdentifier). Built from https://github.com/libsdl-org/SDL by https://github.com/bottlenoselabs/sdk.</PackageDescription>
+    <PackageTags>SDL;SDL3;native;$(SdlNativeRuntimeIdentifier)</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" '$(IsPackable)' == 'true' ">
+    <None Include="$(_SdlNativeLibraryPath)" Pack="true" PackagePath="runtimes/$(SdlNativeRuntimeIdentifier)/native/" />
+    <None Include="$(_SdlSourcePath)/LICENSE.txt" Pack="true" PackagePath="SDL-LICENSE.txt" Condition=" Exists('$(_SdlSourcePath)/LICENSE.txt') " />
+  </ItemGroup>
+
+  <Target Name="_RequireSdlNativeLibrary" BeforeTargets="Pack;Build" Condition=" '$(RequireSdlNativeLibraries)' == 'true' AND !Exists('$(_SdlNativeLibraryPath)') ">
+    <Error Text="Missing $(_SdlNativeLibraryPath). Build it with ext/build-sdl.sh $(SdlNativeRuntimeIdentifier) on $(SdlNativeRuntimeIdentifier.Split('-')[0])." />
+  </Target>
+
+  <Target Name="_ReportSkippedSdlNativePackage" BeforeTargets="Pack" Condition=" '$(IsPackable)' != 'true' AND '$(RequireSdlNativeLibraries)' != 'true' ">
+    <Message Importance="high" Text="$(MSBuildProjectName): skipped, no $(SdlNativeFileName) for $(SdlNativeRuntimeIdentifier) in lib/" />
+  </Target>
+
+</Project>
