@@ -1,0 +1,22 @@
+<Project>
+
+  <!-- Imported by bottlenoselabs.Sdk.GameApp after the project file but before Microsoft.NET.Sdk's targets -->
+
+  <!-- Target framework: when the project sets none, use the .NET version of the SDK pinned in global.json -->
+  <PropertyGroup Condition=" '$(TargetFramework)' == '' AND '$(TargetFrameworks)' == '' ">
+    <TargetFramework>net$(BundledNETCoreAppTargetFrameworkVersion)</TargetFramework>
+  </PropertyGroup>
+
+  <!-- Release on Windows: no console window behind the game window. Debug keeps the console for logs -->
+  <PropertyGroup Condition=" '$(OutputType)' == 'Exe' AND '$(Configuration)' == 'Release' ">
+    <OutputType>WinExe</OutputType>
+  </PropertyGroup>
+
+  <!-- Debug symbols: kept out of the published game so it is harder to reverse engineer. They stay in the build output for crash analysis.
+       Set `IsEnabledPublishDebugSymbols` to `true` to publish them (.pdb on Windows, .dSYM on macOS, .dbg on Linux). -->
+  <PropertyGroup Condition=" '$(IsEnabledPublishDebugSymbols)' != 'true' ">
+    <CopyOutputSymbolsToPublishDirectory>false</CopyOutputSymbolsToPublishDirectory>
+    <StripSymbols>true</StripSymbols>
+  </PropertyGroup>
+
+</Project>

@@ -1,0 +1,11 @@
+<Project>
+
+  <!-- NuGet -->
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <IncludeSymbols>false</IncludeSymbols>
+    <PackageOutputPath>$(_BottlenoseLabsRootPath)/nupkg</PackageOutputPath>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+</Project>

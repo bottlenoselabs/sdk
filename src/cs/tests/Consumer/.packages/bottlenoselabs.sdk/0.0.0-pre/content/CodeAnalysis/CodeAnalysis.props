@@ -1,0 +1,24 @@
+<Project>
+
+  <!-- Custom settings -->
+  <PropertyGroup>
+    <IsEnabledAnalyzers Condition=" '$(IsEnabledAnalyzers)' == '' ">true</IsEnabledAnalyzers>
+  </PropertyGroup>
+
+  <!-- MSBuild settings -->
+  <PropertyGroup Condition=" '$(IsEnabledAnalyzers)' == 'true' ">
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisMode>all</AnalysisMode>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
+    <RunAnalyzersDuringLiveAnalysis>true</RunAnalyzersDuringLiveAnalysis>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <!-- Analyzer and code style rules -->
+  <ItemGroup Condition=" '$(IsEnabledAnalyzers)' == 'true' ">
+    <GlobalAnalyzerConfigFiles Include="$(MSBuildThisFileDirectory)BottlenoseLabs.globalconfig" Link="Properties/BottlenoseLabs.globalconfig" />
+  </ItemGroup>
+
+</Project>

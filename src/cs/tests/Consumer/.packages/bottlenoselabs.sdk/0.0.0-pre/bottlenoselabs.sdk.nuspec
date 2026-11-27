@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
+  <metadata>
+    <id>bottlenoselabs.Sdk</id>
+    <version>0.0.0-pre</version>
+    <authors>bottlenoselabs</authors>
+    <developmentDependency>true</developmentDependency>
+    <icon>icon.png</icon>
+    <iconUrl>https://github.com/bottlenoselabs/.github/blob/6acba5c53d945264b21233a79fbd5b1c3560891e/images/png/logo_padded.png</iconUrl>
+    <description>The MSBuild SDK for C# libraries and apps at Bottlenose Labs. Wraps Microsoft.NET.Sdk.</description>
+    <copyright>© 2026 Bottlenose Labs Inc.</copyright>
+    <packageTypes>
+      <packageType name="MSBuildSdk" />
+    </packageTypes>
+    <repository type="git" url="https://github.com/bottlenoselabs/sdk" commit="2ab99cff70d724d3d926612d498dafbaa674fc84" />
+  </metadata>
+</package>

@@ -25,3 +25,12 @@ jobs:
       # No test projects; the consumer script packs the SDK and checks it
       test: false
       script: "./src/cs/tests/Consumers/test.sh"
+
+  game-publish-job:
+    name: "Game publish"
+    uses: "./.github/workflows/cs-game-publish.yml"
+    with:
+      project: "./src/cs/tests/Consumers/GameApp/GameApp.csproj"
+      # The game consumer uses the SDK from the local folder feed, so pack it first
+      pre-publish-script: "dotnet pack ./src/cs --nologo --verbosity minimal --configuration Release"
+      retention-days: 1
