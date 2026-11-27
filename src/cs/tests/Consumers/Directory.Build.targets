@@ -1,0 +1,72 @@
+<Project>
+
+  <!-- Checks that the packed SDK set what it promises; any failed check fails the build -->
+  <Target Name="VerifyBottlenoseLabsSdk" AfterTargets="Build">
+
+    <PropertyGroup>
+      <_ExpectedGitRepositoryPath>$([MSBuild]::NormalizeDirectory('$(MSBuildThisFileDirectory)../../../..'))</_ExpectedGitRepositoryPath>
+      <_ActualGitRepositoryPath Condition=" '$(GitRepositoryPath)' != '' ">$([MSBuild]::NormalizeDirectory('$(GitRepositoryPath)'))</_ActualGitRepositoryPath>
+      <_PlatformCount>0</_PlatformCount>
+      <_PlatformCount Condition=" '$(IsWindows)' == 'true' ">$([MSBuild]::Add($(_PlatformCount), 1))</_PlatformCount>
+      <_PlatformCount Condition=" '$(IsMacOS)' == 'true' ">$([MSBuild]::Add($(_PlatformCount), 1))</_PlatformCount>
+      <_PlatformCount Condition=" '$(IsLinux)' == 'true' ">$([MSBuild]::Add($(_PlatformCount), 1))</_PlatformCount>
+      <_PlatformCount Condition=" '$(IsFreeBSD)' == 'true' ">$([MSBuild]::Add($(_PlatformCount), 1))</_PlatformCount>
+      <_DefineConstants>;$(DefineConstants);</_DefineConstants>
+      <!-- Each consumer project is named after the SDK it uses -->
+      <_ExpectedSdkName Condition=" '$(MSBuildProjectName)' == 'Console' ">bottlenoselabs.Sdk</_ExpectedSdkName>
+      <_ExpectedSdkName Condition=" '$(MSBuildProjectName)' == 'WebApp' ">bottlenoselabs.Sdk.WebApp</_ExpectedSdkName>
+      <_ExpectedSdkName Condition=" '$(MSBuildProjectName)' == 'GameApp' ">bottlenoselabs.Sdk.GameApp</_ExpectedSdkName>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <_DisableRuntimeMarshalling Include="@(AssemblyAttribute)" Condition=" '%(Identity)' == 'System.Runtime.CompilerServices.DisableRuntimeMarshallingAttribute' " />
+      <_ExcludeFromCodeCoverage Include="@(AssemblyAttribute)" Condition=" '%(Identity)' == 'System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage' " />
+    </ItemGroup>
+
+    <!-- Which SDK -->
+    <Error Condition=" '$(BottlenoseLabsSdkName)' != '$(_ExpectedSdkName)' " Text="BottlenoseLabsSdkName is '$(BottlenoseLabsSdkName)', expected '$(_ExpectedSdkName)'." />
+
+    <!-- Git repository root -->
+    <Error Condition=" '$(_ActualGitRepositoryPath)' != '$(_ExpectedGitRepositoryPath)' " Text="GitRepositoryPath is '$(GitRepositoryPath)', expected '$(_ExpectedGitRepositoryPath)'." />
+
+    <!-- Platform: exactly one operating system, and only its constant -->
+    <Error Condition=" '$(_PlatformCount)' != '1' " Text="Expected exactly one of IsWindows, IsMacOS, IsLinux, IsFreeBSD to be true; $(_PlatformCount) are." />
+    <Error Condition=" '$(IsWindows)' == 'true' AND !$(_DefineConstants.Contains(';WINDOWS;')) " Text="DefineConstants '$(DefineConstants)' is missing WINDOWS." />
+    <Error Condition=" '$(IsMacOS)' == 'true' AND !$(_DefineConstants.Contains(';MACOS;')) " Text="DefineConstants '$(DefineConstants)' is missing MACOS." />
+    <Error Condition=" '$(IsLinux)' == 'true' AND !$(_DefineConstants.Contains(';LINUX;')) " Text="DefineConstants '$(DefineConstants)' is missing LINUX." />
+    <Error Condition=" '$(IsFreeBSD)' != 'true' AND $(_DefineConstants.Contains(';FREEBSD;')) " Text="DefineConstants '$(DefineConstants)' has FREEBSD, but this is not FreeBSD." />
+    <Error Condition=" '$(IsLinux)' != 'true' AND $(_DefineConstants.Contains(';LINUX;')) " Text="DefineConstants '$(DefineConstants)' has LINUX, but this is not Linux." />
+
+    <!-- Code coverage: excluded only when IsEnabledCodeCoverage is false -->
+    <Error Condition=" '$(IsEnabledCodeCoverage)' == 'false' AND '@(_ExcludeFromCodeCoverage)' == '' " Text="IsEnabledCodeCoverage is false, but the assembly is not excluded from code coverage." />
+    <Error Condition=" '$(IsEnabledCodeCoverage)' != 'false' AND '@(_ExcludeFromCodeCoverage)' != '' " Text="IsEnabledCodeCoverage is not false, but the assembly is excluded from code coverage." />
+
+    <!-- Compilation: NativeAOT for Release executables only; AOT analyzers always -->
+    <Error Condition=" '$(Configuration)' == 'Release' AND '$(PublishAot)' != 'true' " Text="PublishAot is '$(PublishAot)' in Release, expected 'true'." />
+    <Error Condition=" '$(Configuration)' != 'Release' AND '$(PublishAot)' == 'true' " Text="PublishAot is 'true' in $(Configuration), expected it unset." />
+    <Error Condition=" '$(EnableAotAnalyzer)' != 'true' " Text="EnableAotAnalyzer is '$(EnableAotAnalyzer)', expected 'true'." />
+    <Error Condition=" '$(TieredCompilation)' == 'false' " Text="TieredCompilation is 'false'; the runtime default is expected." />
+
+    <!-- Project defaults -->
+    <Error Condition=" '$(Company)' != 'bottlenoselabs' " Text="Company is '$(Company)', expected 'bottlenoselabs'." />
+    <Error Condition=" '$(Nullable)' != 'enable' " Text="Nullable is '$(Nullable)', expected 'enable'." />
+    <Error Condition=" '$(TreatWarningsAsErrors)' != 'true' " Text="TreatWarningsAsErrors is '$(TreatWarningsAsErrors)', expected 'true'." />
+
+    <!-- Web: wraps Microsoft.NET.Sdk.Web -->
+    <Error Condition=" '$(BottlenoseLabsSdkName)' == 'bottlenoselabs.Sdk.WebApp' AND '$(UsingMicrosoftNETSdkWeb)' != 'true' " Text="bottlenoselabs.Sdk.WebApp does not wrap Microsoft.NET.Sdk.Web." />
+
+    <!-- Game: defaults with an empty project file, and assets next to the executable -->
+    <Error Condition=" '$(BottlenoseLabsSdkName)' == 'bottlenoselabs.Sdk.GameApp' AND '$(TargetFramework)' != 'net$(BundledNETCoreAppTargetFrameworkVersion)' " Text="Game TargetFramework is '$(TargetFramework)', expected 'net$(BundledNETCoreAppTargetFrameworkVersion)'." />
+    <Error Condition=" '$(BottlenoseLabsSdkName)' == 'bottlenoselabs.Sdk.GameApp' AND '$(Configuration)' == 'Release' AND '$(OutputType)' != 'WinExe' " Text="Game OutputType is '$(OutputType)' in Release, expected 'WinExe'." />
+    <Error Condition=" '$(BottlenoseLabsSdkName)' == 'bottlenoselabs.Sdk.GameApp' AND '$(Configuration)' != 'Release' AND '$(OutputType)' != 'Exe' " Text="Game OutputType is '$(OutputType)' in $(Configuration), expected 'Exe'." />
+    <Error Condition=" '$(BottlenoseLabsSdkName)' == 'bottlenoselabs.Sdk.GameApp' AND '$(InvariantGlobalization)' != 'true' " Text="Game InvariantGlobalization is '$(InvariantGlobalization)', expected 'true'." />
+    <Error Condition=" '$(BottlenoseLabsSdkName)' == 'bottlenoselabs.Sdk.GameApp' AND !Exists('$(OutDir)Assets/Text/hello.txt') " Text="Game asset was not copied to '$(OutDir)Assets/Text/hello.txt'." />
+
+    <Error Condition=" '$(BottlenoseLabsSdkName)' == 'bottlenoselabs.Sdk.GameApp' AND '@(_DisableRuntimeMarshalling)' == '' " Text="Game runtime marshalling is not disabled." />
+    <Error Condition=" '$(BottlenoseLabsSdkName)' == 'bottlenoselabs.Sdk.GameApp' AND '$(CopyOutputSymbolsToPublishDirectory)' != 'false' " Text="Game CopyOutputSymbolsToPublishDirectory is '$(CopyOutputSymbolsToPublishDirectory)', expected 'false'." />
+    <Error Condition=" '$(BottlenoseLabsSdkName)' != 'bottlenoselabs.Sdk.GameApp' AND '@(_DisableRuntimeMarshalling)' != '' " Text="Runtime marshalling is disabled outside bottlenoselabs.Sdk.GameApp." />
+
+    <Message Importance="high" Text="$(BottlenoseLabsSdkName) checks passed ($(MSBuildProjectName), Configuration='$(Configuration)', IsEnabledCodeCoverage='$(IsEnabledCodeCoverage)')." />
+  </Target>
+
+</Project>

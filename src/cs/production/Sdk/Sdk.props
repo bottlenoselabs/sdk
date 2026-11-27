@@ -1,15 +1,20 @@
 <Project>
 
-  <!-- Custom project settings -->
+  <!-- Git repository root: the closest directory above that has a `.git` folder (normal clone) or a `.git` file (worktree or submodule) -->
   <PropertyGroup>
-    <GitRepositoryPath>$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), .gitignore))</GitRepositoryPath>
+    <_GitFolderRepositoryPath>$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), .git/HEAD))</_GitFolderRepositoryPath>
+    <_GitFileRepositoryPath>$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), .git))</_GitFileRepositoryPath>
+    <GitRepositoryPath>$(_GitFolderRepositoryPath)</GitRepositoryPath>
+    <GitRepositoryPath Condition=" '$(_GitFileRepositoryPath)' != '' AND $(_GitFileRepositoryPath.Length) &gt; $(_GitFolderRepositoryPath.Length) ">$(_GitFileRepositoryPath)</GitRepositoryPath>
+    <!-- Root for build output: the Git repository, or the project directory outside a Git repository -->
+    <_BottlenoseLabsRootPath>$(GitRepositoryPath)</_BottlenoseLabsRootPath>
+    <_BottlenoseLabsRootPath Condition=" '$(_BottlenoseLabsRootPath)' == '' ">$(MSBuildProjectDirectory)</_BottlenoseLabsRootPath>
   </PropertyGroup>
 
-  <!-- Output: all projects build to <git repository>/artifacts (or next to the project when not in a git repository) -->
+  <!-- Output: all projects build to <Git repository root>/artifacts (or next to the project outside a Git repository) -->
   <PropertyGroup>
     <UseArtifactsOutput>true</UseArtifactsOutput>
-    <ArtifactsPath Condition=" '$(GitRepositoryPath)' != '' ">$(GitRepositoryPath)/artifacts</ArtifactsPath>
-    <ArtifactsPath Condition=" '$(GitRepositoryPath)' == '' ">$(MSBuildProjectDirectory)/artifacts</ArtifactsPath>
+    <ArtifactsPath>$(_BottlenoseLabsRootPath)/artifacts</ArtifactsPath>
   </PropertyGroup>
 
   <!-- MSBuild project settings -->
@@ -27,16 +32,14 @@
     <AppendRuntimeIdentifierToOutputPath>true</AppendRuntimeIdentifierToOutputPath>
     <MSBuildTreatWarningsAsErrors>true</MSBuildTreatWarningsAsErrors>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <PublishReadyToRun>false</PublishReadyToRun>
-    <TieredCompilation>false</TieredCompilation>
   </PropertyGroup>
 
   <!-- Platform -->
   <PropertyGroup>
-    <IsWindows Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' == 'true' ">true</IsWindows>
-    <IsMacOS Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' == 'true' ">true</IsMacOS>
-    <IsLinux Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' == 'true' ">true</IsLinux>
-    <IsFreeBSD Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' == 'true' ">true</IsFreeBSD>
+    <IsWindows Condition=" $([MSBuild]::IsOSPlatform('Windows')) ">true</IsWindows>
+    <IsMacOS Condition=" $([MSBuild]::IsOSPlatform('OSX')) ">true</IsMacOS>
+    <IsLinux Condition=" $([MSBuild]::IsOSPlatform('Linux')) ">true</IsLinux>
+    <IsFreeBSD Condition=" $([MSBuild]::IsOSPlatform('FreeBSD')) ">true</IsFreeBSD>
     <ArchitectureCaseSensitive>$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)</ArchitectureCaseSensitive>
     <Architecture>$(ArchitectureCaseSensitive.ToLower())</Architecture>
     <Is32Bit Condition=" '$(Architecture)' == 'x86' OR '$(Architecture)' == 'arm32' ">true</Is32Bit>
@@ -44,29 +47,13 @@
     <Is64Bit Condition=" '$(Architecture)' == 'x64' OR '$(Architecture)' == 'arm64' ">true</Is64Bit>
     <Is64Bit Condition=" '$(Architecture)' != 'x64' AND '$(Architecture)' != 'arm64' ">false</Is64Bit>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(IsWindows)' == 'true' ">
-    <DefineConstants>WINDOWS</DefineConstants>
+  <!-- Append, so constants set by earlier imports are kept -->
+  <PropertyGroup>
+    <DefineConstants Condition=" '$(IsWindows)' == 'true' ">$(DefineConstants);WINDOWS</DefineConstants>
+    <DefineConstants Condition=" '$(IsMacOS)' == 'true' ">$(DefineConstants);MACOS</DefineConstants>
+    <DefineConstants Condition=" '$(IsLinux)' == 'true' ">$(DefineConstants);LINUX</DefineConstants>
+    <DefineConstants Condition=" '$(IsFreeBSD)' == 'true' ">$(DefineConstants);FREEBSD</DefineConstants>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(IsMacOS)' == 'true' ">
-    <DefineConstants>MACOS</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(IsLinux)' == 'true' ">
-    <DefineConstants>LINUX</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(IsFreeBSD)' == 'true' ">
-    <DefineConstants>FREEBSD</DefineConstants>
-  </PropertyGroup>
-
-  <!-- Content include all files + compile all .cs files -->
-  <ItemGroup>
-    <Content Include="$(_BottlenoseLabsSdkContentDirectoryPath)/**/*.*">
-      <Pack>false</Pack>
-      <Link>Properties/bottlenoselabs/$(MSBuildThisFileName)/%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Content>
-    <Compile Include="$(_BottlenoseLabsSdkContentDirectoryPath)/**/*.cs" >
-      <Link>Properties/bottlenoselabs/$(MSBuildThisFileName)/%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Compile>
-  </ItemGroup>
 
   <!-- Code analysis -->
   <Import Project="$(MSBuildThisFileDirectory)/CodeAnalysis/CodeAnalysis.props" />

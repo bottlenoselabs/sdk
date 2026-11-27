@@ -1,0 +1,14 @@
+<Project>
+
+  <!-- Wrapped Sdk: our early targets need the project file but must come before Microsoft.NET.Sdk -->
+  <Import Project="$(_BottlenoseLabsSdkContentDirectoryPath)/GameApp/GameApp.Early.targets" />
+  <Import Project="$(_BottlenoseLabsSdkContentDirectoryPath)/Compilation/Compilation.targets" />
+
+  <!-- Then Microsoft.NET.Sdk, then our targets come last -->
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+
+  <Import Project="$(_BottlenoseLabsSdkContentDirectoryPath)/Sdk.targets" />
+
+  <Import Project="$(_BottlenoseLabsSdkContentDirectoryPath)/GameApp/GameApp.targets" />
+
+</Project>

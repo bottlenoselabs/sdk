@@ -1,9 +1,8 @@
 <Project>
 
-  <!-- This repository's own projects use Microsoft.NET.Sdk directly, so import the Sdk content, not the wrapper -->
+  <!-- This repository's own projects use Microsoft.NET.Sdk directly, so import the shared SDK content, not a wrapper -->
   <PropertyGroup>
-    <_BottlenoseLabsSdkDirectoryPath>$(MSBuildThisFileDirectory)production/Sdk</_BottlenoseLabsSdkDirectoryPath>
-    <_BottlenoseLabsSdkContentDirectoryPath>$(_BottlenoseLabsSdkDirectoryPath)</_BottlenoseLabsSdkContentDirectoryPath>
+    <_BottlenoseLabsSdkContentDirectoryPath>$(MSBuildThisFileDirectory)production/Sdk</_BottlenoseLabsSdkContentDirectoryPath>
   </PropertyGroup>
   <Import Project="$(_BottlenoseLabsSdkContentDirectoryPath)/Sdk.props" />
 

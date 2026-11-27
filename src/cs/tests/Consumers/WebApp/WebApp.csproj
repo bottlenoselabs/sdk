@@ -1,0 +1,7 @@
+<Project Sdk="bottlenoselabs.Sdk.WebApp">
+
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+  </PropertyGroup>
+
+</Project>

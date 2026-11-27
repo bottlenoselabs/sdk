@@ -5,8 +5,8 @@
         <Version>0.0.0.0-pre</Version>
     </PropertyGroup>
 
-    <!-- Enable/disable code coverage -->
-    <ItemGroup Condition=" '$(IsEnabledCodeCoverage)' == 'true' ">
+    <!-- Code coverage: set `IsEnabledCodeCoverage` to `false` to exclude the whole assembly from coverage reports -->
+    <ItemGroup Condition=" '$(IsEnabledCodeCoverage)' == 'false' ">
         <AssemblyAttribute Include="System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage" />
     </ItemGroup>
 

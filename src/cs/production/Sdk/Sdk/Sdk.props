@@ -1,10 +1,10 @@
 <Project>
 
+  <!-- Shared SDK content: content/ inside the NuGet package, or production/Sdk/ in this repository -->
   <PropertyGroup>
-    <_BottlenoseLabsSdkDirectoryPath Condition="Exists('$(MSBuildThisFileDirectory)../Sdk.props')">$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..'))</_BottlenoseLabsSdkDirectoryPath>
-    <_BottlenoseLabsSdkDirectoryPath Condition="Exists('$(MSBuildThisFileDirectory)../content/Sdk.props')">$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..'))</_BottlenoseLabsSdkDirectoryPath>
-    <_BottlenoseLabsSdkContentDirectoryPath Condition="Exists('$(MSBuildThisFileDirectory)../Sdk.props')">$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..'))</_BottlenoseLabsSdkContentDirectoryPath>
+    <BottlenoseLabsSdkName>bottlenoselabs.Sdk</BottlenoseLabsSdkName>
     <_BottlenoseLabsSdkContentDirectoryPath Condition="Exists('$(MSBuildThisFileDirectory)../content/Sdk.props')">$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../content'))</_BottlenoseLabsSdkContentDirectoryPath>
+    <_BottlenoseLabsSdkContentDirectoryPath Condition=" '$(_BottlenoseLabsSdkContentDirectoryPath)' == '' ">$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../Sdk'))</_BottlenoseLabsSdkContentDirectoryPath>
   </PropertyGroup>
 
   <Import Project="$(_BottlenoseLabsSdkContentDirectoryPath)/Sdk.props" />
