@@ -17,6 +17,7 @@ source_dir="$root/ext/SDL"
 macos_minimum_version="15.0"
 
 # HOST_RID, HOST_RID_OS: this computer's runtime identifier and its operating system part
+# shellcheck source=src/bash/host-rid.sh
 source "$root/src/bash/host-rid.sh"
 
 rid="${1:-$HOST_RID}"

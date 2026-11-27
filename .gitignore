@@ -18,3 +18,7 @@
 # Native libraries built from ext/ (ext/build-sdl.sh)
 /lib/
 /ext/.build/
+
+# SDL bindgen intermediate files (bindgen/SDL/bindgen.sh)
+/bindgen/*/ffi/
+/bindgen/*/ffi-x/
