@@ -1,5 +1,7 @@
 <Solution>
   <Folder Name="/production/">
     <Project Path="production/Sdk/Sdk.csproj" />
+    <Project Path="production/Sdk.GameApp/Sdk.GameApp.csproj" />
+    <Project Path="production/Sdk.WebApp/Sdk.WebApp.csproj" />
   </Folder>
 </Solution>

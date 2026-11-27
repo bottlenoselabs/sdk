@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageDescription>The MSBuild SDK for C# games at Bottlenose Labs. Wraps Microsoft.NET.Sdk.</PackageDescription>
+  </PropertyGroup>
+
+  <Import Project="../SdkPackage.targets" />
+
+</Project>

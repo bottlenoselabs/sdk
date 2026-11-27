@@ -1,0 +1,7 @@
+{
+  "msbuild-sdks": {
+    "bottlenoselabs.Sdk": "0.0.0-pre",
+    "bottlenoselabs.Sdk.WebApp": "0.0.0-pre",
+    "bottlenoselabs.Sdk.GameApp": "0.0.0-pre"
+  }
+}

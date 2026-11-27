@@ -1,0 +1,84 @@
+# Reusable: build and test a .NET solution on each operating system.
+#
+# Usage from another repository:
+#
+#   jobs:
+#     build:
+#       uses: bottlenoselabs/sdk/.github/workflows/cs-build.yml@<tag>
+#       with:
+#         path: ./src/cs
+
+name: "C# build"
+
+on:
+  workflow_call:
+    inputs:
+      path:
+        description: "Solution, project, or directory to build"
+        type: string
+        default: "."
+      configuration:
+        description: "Build configuration"
+        type: string
+        default: "Release"
+      runs-on:
+        description: "JSON array of runner labels; one job runs on each"
+        type: string
+        default: '["windows-latest", "ubuntu-latest", "macos-latest"]'
+      global-json-file:
+        description: "global.json that pins the .NET SDK version"
+        type: string
+        default: "global.json"
+      test:
+        description: "Run `dotnet test` after the build"
+        type: boolean
+        default: true
+      script:
+        description: "Optional Bash commands to run after the build and tests, from the repository root"
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+
+  build-job:
+    name: "Build: ${{ matrix.os }}"
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ${{ fromJSON(inputs.runs-on) }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+
+      - name: "Clone Git repository"
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: "Setup .NET"
+        uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          global-json-file: ${{ inputs.global-json-file }}
+
+      - name: ".NET build"
+        env:
+          BUILD_PATH: ${{ inputs.path }}
+          CONFIGURATION: ${{ inputs.configuration }}
+        run: dotnet build "$BUILD_PATH" --nologo --verbosity minimal --configuration "$CONFIGURATION"
+
+      - name: ".NET test"
+        if: ${{ inputs.test }}
+        env:
+          BUILD_PATH: ${{ inputs.path }}
+          CONFIGURATION: ${{ inputs.configuration }}
+        run: dotnet test "$BUILD_PATH" --nologo --verbosity minimal --configuration "$CONFIGURATION" --no-build
+
+      - name: "Run script"
+        if: ${{ inputs.script != '' }}
+        env:
+          SCRIPT: ${{ inputs.script }}
+        run: bash -euo pipefail -c "$SCRIPT"

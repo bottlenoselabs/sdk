@@ -23,18 +23,23 @@ concurrency:
 
 jobs:
 
-  test-job:
-    name: "Test SDK"
-    uses: "./.github/workflows/test.yml"
+  build-job:
+    name: "Build"
+    uses: "./.github/workflows/cs-build.yml"
+    with:
+      path: "./src/cs"
+      test: false
+      script: "./src/cs/tests/Consumers/test.sh"
 
   release-job:
     name: "Release"
-    needs: [test-job]
-    uses: "bottlenoselabs/.github/.github/workflows/release-nuget.yml@5ccd4dd015843eb598fa9f6a5ea5703ce974f28b" # main
+    needs: [build-job]
+    uses: "./.github/workflows/cs-release.yml"
     permissions:
       contents: write
       id-token: write
     with:
+      path: "./src/cs"
       pre-release: ${{ inputs.pre-release }}
       version: ${{ inputs.version }}
     secrets:

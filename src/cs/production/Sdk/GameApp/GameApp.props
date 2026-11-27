@@ -1,0 +1,26 @@
+<Project>
+
+  <!-- Imported by bottlenoselabs.Sdk.GameApp before the project file; the project can override any of it -->
+
+  <!-- A game is an executable -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <!-- Same behavior in Debug and Release: culture-independent number and text formatting (also deterministic across players' machines), and no ICU dependency on Linux -->
+  <PropertyGroup>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+
+  <!-- Assets: every file under this folder (relative to the project) is copied next to the executable, on build and on publish -->
+  <PropertyGroup>
+    <GameAssetsDirectory>Assets</GameAssetsDirectory>
+  </PropertyGroup>
+
+  <!-- Publish: ship the game, not the developer files -->
+  <PropertyGroup>
+    <PublishDocumentationFile>false</PublishDocumentationFile>
+    <PublishReferencesDocumentationFiles>false</PublishReferencesDocumentationFiles>
+  </PropertyGroup>
+
+</Project>

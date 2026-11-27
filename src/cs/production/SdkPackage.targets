@@ -1,0 +1,27 @@
+<Project>
+
+  <!-- Shared by every bottlenoselabs.Sdk* package project: each package is a wrapper MSBuild SDK plus a copy of the shared content -->
+
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <IsPackable>true</IsPackable>
+    <PackageType>MSBuildSdk</PackageType>
+    <DevelopmentDependency>true</DevelopmentDependency>
+    <RepositoryUrl>https://github.com/bottlenoselabs/sdk</RepositoryUrl>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <IncludeSymbols>false</IncludeSymbols>
+    <NoWarn>$(NoWarn);NU5128</NoWarn> <!-- No lib/ folder, on purpose -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Entry points that MSBuild finds by the package name: this project's own Sdk/ folder -->
+    <None Include="$(MSBuildProjectDirectory)/Sdk/Sdk.props;$(MSBuildProjectDirectory)/Sdk/Sdk.targets" Pack="true" PackagePath="Sdk/" />
+    <!-- Shared content the entry points import -->
+    <None Include="$(MSBuildThisFileDirectory)Sdk/**/*.props;$(MSBuildThisFileDirectory)Sdk/**/*.targets;$(MSBuildThisFileDirectory)Sdk/**/*.globalconfig;$(MSBuildThisFileDirectory)Sdk/icon.png"
+          Exclude="$(MSBuildThisFileDirectory)Sdk/Sdk/**;$(MSBuildThisFileDirectory)Sdk/bin/**;$(MSBuildThisFileDirectory)Sdk/obj/**"
+          Pack="true" PackagePath="content/" Visible="false" />
+  </ItemGroup>
+
+</Project>

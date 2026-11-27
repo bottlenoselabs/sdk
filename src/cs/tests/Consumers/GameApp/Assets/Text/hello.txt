@@ -1,0 +1,1 @@
+Hello from the game consumer project's assets.

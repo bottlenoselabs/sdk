@@ -17,6 +17,11 @@ concurrency:
 
 jobs:
 
-  test-job:
-    name: "Test"
-    uses: "./.github/workflows/test.yml"
+  build-job:
+    name: "Build"
+    uses: "./.github/workflows/cs-build.yml"
+    with:
+      path: "./src/cs"
+      # No test projects; the consumer script packs the SDK and checks it
+      test: false
+      script: "./src/cs/tests/Consumers/test.sh"

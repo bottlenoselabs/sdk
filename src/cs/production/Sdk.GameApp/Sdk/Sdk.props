@@ -1,0 +1,18 @@
+<Project>
+
+  <!-- Shared SDK content: content/ inside the NuGet package, or production/Sdk/ in this repository -->
+  <PropertyGroup>
+    <BottlenoseLabsSdkName>bottlenoselabs.Sdk.GameApp</BottlenoseLabsSdkName>
+    <_BottlenoseLabsSdkContentDirectoryPath Condition="Exists('$(MSBuildThisFileDirectory)../content/Sdk.props')">$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../content'))</_BottlenoseLabsSdkContentDirectoryPath>
+    <_BottlenoseLabsSdkContentDirectoryPath Condition=" '$(_BottlenoseLabsSdkContentDirectoryPath)' == '' ">$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../Sdk'))</_BottlenoseLabsSdkContentDirectoryPath>
+  </PropertyGroup>
+
+  <Import Project="$(_BottlenoseLabsSdkContentDirectoryPath)/Sdk.props" />
+
+  <!-- Game -->
+  <Import Project="$(_BottlenoseLabsSdkContentDirectoryPath)/GameApp/GameApp.props" />
+
+  <!-- Wrapped Sdk: our props come first, then Microsoft.NET.Sdk -->
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+
+</Project>

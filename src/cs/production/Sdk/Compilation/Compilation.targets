@@ -1,0 +1,37 @@
+<Project>
+
+  <!--
+    Imported after the project file (so OutputType and Configuration are known) but before Microsoft.NET.Sdk's targets (so they still apply).
+    Debug: JIT with the runtime's defaults, for fast builds while prototyping.
+    Release: `dotnet publish` compiles executables ahead of time with NativeAOT, for no JIT cold start and lower memory use.
+  -->
+
+  <PropertyGroup>
+    <_IsExecutable Condition=" '$(OutputType)' == 'Exe' OR '$(OutputType)' == 'WinExe' ">true</_IsExecutable>
+  </PropertyGroup>
+
+  <!-- Release executables: NativeAOT, optimized for speed over size -->
+  <PropertyGroup Condition=" '$(_IsExecutable)' == 'true' AND '$(Configuration)' == 'Release' ">
+    <PublishAot Condition=" '$(PublishAot)' == '' ">true</PublishAot>
+    <OptimizationPreference Condition=" '$(OptimizationPreference)' == '' ">Speed</OptimizationPreference>
+  </PropertyGroup>
+
+  <!-- Executables, any configuration: report NativeAOT and trimming problems in Debug too, not only when Release is published -->
+  <PropertyGroup Condition=" '$(_IsExecutable)' == 'true' ">
+    <EnableAotAnalyzer Condition=" '$(EnableAotAnalyzer)' == '' ">true</EnableAotAnalyzer>
+    <EnableTrimAnalyzer Condition=" '$(EnableTrimAnalyzer)' == '' ">true</EnableTrimAnalyzer>
+    <EnableSingleFileAnalyzer Condition=" '$(EnableSingleFileAnalyzer)' == '' ">true</EnableSingleFileAnalyzer>
+  </PropertyGroup>
+
+  <!-- Web executables, any configuration: the source generators that ASP.NET Core turns on only with PublishAot, so minimal APIs and configuration binding pass the analyzers above in Debug too -->
+  <PropertyGroup Condition=" '$(_IsExecutable)' == 'true' AND '$(UsingMicrosoftNETSdkWeb)' == 'true' ">
+    <EnableRequestDelegateGenerator Condition=" '$(EnableRequestDelegateGenerator)' == '' ">true</EnableRequestDelegateGenerator>
+    <EnableConfigurationBindingGenerator Condition=" '$(EnableConfigurationBindingGenerator)' == '' ">true</EnableConfigurationBindingGenerator>
+  </PropertyGroup>
+
+  <!-- Libraries: must work inside a NativeAOT executable, so check them the same way (needs .NET 8 or later) -->
+  <PropertyGroup Condition=" '$(_IsExecutable)' != 'true' AND '$(TargetFramework)' != '' AND $([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0')) ">
+    <IsAotCompatible Condition=" '$(IsAotCompatible)' == '' ">true</IsAotCompatible>
+  </PropertyGroup>
+
+</Project>
