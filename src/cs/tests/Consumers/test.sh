@@ -26,21 +26,56 @@ if [[ -n "$leftovers" ]]; then
     exit 1
 fi
 
-# Run the native executables; a non-zero exit code fails the script. The web app is not run, since it would not exit.
-for project in Console GameApp; do
-    # Only the top of the publish folder: symbol folders such as Game.dSYM hold a file with the same name
-    executable=""
-    for candidate in artifacts/publish/"$project"/release*/"$project" artifacts/publish/"$project"/release*/"$project".exe; do
+# Finds the executable a publish folder starts the game with: the .app bundle on macOS, the AppDir launcher on Linux,
+# or the executable itself (Windows, and the console project). Only looks at the top level, since symbol folders such as
+# Game.dSYM hold a file with the same name.
+published_executable() {
+    local folder="$1"
+    local name="$2"
+    local candidate
+    for candidate in "$folder/$name.app/Contents/MacOS/$name" "$folder/$name.AppDir/AppRun" "$folder/$name" "$folder/$name.exe"; do
         if [[ -f "$candidate" ]]; then
-            executable="$candidate"
+            echo "$candidate"
+            return 0
         fi
     done
-    if [[ -z "$executable" ]]; then
-        echo "No published executable found in artifacts/publish/$project" >&2
-        exit 1
-    fi
-    "$executable"
-done
+    echo "No published executable found in $folder" >&2
+    return 1
+}
+
+# Checks the platform app format that bottlenoselabs.Sdk.GameApp made from a publish folder. Pass `assets` as the third
+# argument when the game has an Assets folder.
+check_game_package() {
+    local folder="$1"
+    local name="$2"
+    local assets="${3:-}"
+    case "$(uname -s)" in
+        Darwin)
+            local app="$folder/$name.app"
+            local files=("$app/Contents/Info.plist" "$app/Contents/Resources/$name.icns")
+            [[ -n "$assets" ]] && files+=("$app/Contents/MacOS/Assets" "$app/Contents/Resources/Assets")
+            for file in "${files[@]}"; do
+                [[ -e "$file" ]] || { echo "Missing in the .app bundle: $file" >&2; return 1; }
+            done
+            plutil -lint "$app/Contents/Info.plist"
+            codesign --verify --strict "$app"
+            ;;
+        Linux)
+            local appdir="$folder/$name.AppDir"
+            local files=("$appdir/AppRun" "$appdir/$name.desktop" "$appdir/$name.png" "$appdir/usr/bin/$name")
+            [[ -n "$assets" ]] && files+=("$appdir/usr/bin/Assets")
+            for file in "${files[@]}"; do
+                [[ -e "$file" ]] || { echo "Missing in the AppDir: $file" >&2; return 1; }
+            done
+            [[ -x "$appdir/AppRun" ]] || { echo "AppRun is not executable" >&2; return 1; }
+            ;;
+    esac
+}
+
+# Run the native executables; a non-zero exit code fails the script. The web app is not run, since it would not exit.
+check_game_package artifacts/publish/GameApp/release* GameApp assets
+"$(published_executable artifacts/publish/Console/release* Console)"
+"$(published_executable artifacts/publish/GameApp/release* GameApp)"
 
 # Templates: create a repository from each one, outside this repository like a real new repository, and build it against the packed SDKs
 work="$(mktemp -d)"
@@ -85,4 +120,5 @@ done
 
 # The game template publishes and runs
 (cd "$work/TestGame" && dotnet publish --disable-build-servers ./src/cs/TestGame --nologo --output "$work/TestGame-publish")
-"$work/TestGame-publish/TestGame" 2>/dev/null || "$work/TestGame-publish/TestGame.exe"
+check_game_package "$work/TestGame-publish" TestGame
+"$(published_executable "$work/TestGame-publish" TestGame)"

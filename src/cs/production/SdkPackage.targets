@@ -12,14 +12,14 @@
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <IncludeSymbols>false</IncludeSymbols>
-    <NoWarn>$(NoWarn);NU5128</NoWarn> <!-- No lib/ folder, on purpose -->
+    <NoWarn>$(NoWarn);NU5128;NU5110;NU5111</NoWarn> <!-- No lib/ folder, on purpose; GameApp/Packaging/*.ps1 is run by the SDK, not by NuGet -->
   </PropertyGroup>
 
   <ItemGroup>
     <!-- Entry points that MSBuild finds by the package name: this project's own Sdk/ folder -->
     <None Include="$(MSBuildProjectDirectory)/Sdk/Sdk.props;$(MSBuildProjectDirectory)/Sdk/Sdk.targets" Pack="true" PackagePath="Sdk/" />
     <!-- Shared content the entry points import -->
-    <None Include="$(MSBuildThisFileDirectory)Sdk/**/*.props;$(MSBuildThisFileDirectory)Sdk/**/*.targets;$(MSBuildThisFileDirectory)Sdk/**/*.globalconfig;$(MSBuildThisFileDirectory)Sdk/icon.png"
+    <None Include="$(MSBuildThisFileDirectory)Sdk/**/*.props;$(MSBuildThisFileDirectory)Sdk/**/*.targets;$(MSBuildThisFileDirectory)Sdk/**/*.globalconfig;$(MSBuildThisFileDirectory)Sdk/icon.png;$(MSBuildThisFileDirectory)Sdk/**/*.manifest;$(MSBuildThisFileDirectory)Sdk/**/*.ps1;$(MSBuildThisFileDirectory)Sdk/**/*.sh"
           Exclude="$(MSBuildThisFileDirectory)Sdk/Sdk/**;$(MSBuildThisFileDirectory)Sdk/bin/**;$(MSBuildThisFileDirectory)Sdk/obj/**"
           Pack="true" PackagePath="content/" Visible="false" />
   </ItemGroup>

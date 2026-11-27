@@ -112,6 +112,10 @@ Because `Release` publishes with NativeAOT, use minimal APIs with `WebApplicatio
 | `PublishDocumentationFile`, `PublishReferencesDocumentationFiles` | `false`: no `.xml` files in the published game |
 | `IsEnabledPublishDebugSymbols` | Not set: debug symbols (`.pdb`, `.dSYM`, `.dbg`) stay in the build output for crash analysis but are kept out of the published game, so it is harder to reverse engineer. Set to `true` to publish them |
 | `IsEnabledRuntimeMarshalling` | Not set: `[DisableRuntimeMarshalling]`, so P/Invoke calls into native libraries such as SDL pass blittable types straight through. Set to `true` to turn runtime marshalling back on |
+| `GameAppIcon` | `icon.png` next to the project file, or the Bottlenose Labs logo. Any square PNG; 1024×1024 or larger looks best. Used for the Windows `.exe`, the macOS `.app` and the Linux AppImage |
+| `ApplicationManifest` | A Windows manifest with per-monitor DPI awareness (no blurry scaling), long paths and UTF-8 |
+| `IsEnabledPlatformPackaging` | `true`: `dotnet publish` makes `<name>.app` on macOS (with `Info.plist`, `.icns` icon and an ad-hoc signature) and `<name>.AppDir` on Linux. `cs-game-publish.yml` turns the AppDir into one `<name>.AppImage` file. Set to `false` for a plain folder |
+| `GameAppDisplayName`, `GameAppBundleIdentifier`, `GameAppMinimumMacOSVersion` | `$(Product)`, `com.<company>.<assembly name>` in lowercase, `15.0` (the oldest macOS .NET 11 supports) |
 
 To override an analyzer or code style rule, add it to an `.editorconfig` file in your repository:
 

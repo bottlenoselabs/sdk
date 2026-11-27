@@ -17,6 +17,14 @@
     <GameAssetsDirectory>Assets</GameAssetsDirectory>
   </PropertyGroup>
 
+  <!-- Platform packaging (see Packaging/Packaging.targets): icon, Windows manifest, and macOS .app / Linux .AppDir on publish -->
+  <PropertyGroup>
+    <IsEnabledPlatformPackaging>true</IsEnabledPlatformPackaging>
+    <!-- The oldest macOS that .NET 11 supports -->
+    <GameAppMinimumMacOSVersion>15.0</GameAppMinimumMacOSVersion>
+    <ApplicationManifest>$(_BottlenoseLabsSdkContentDirectoryPath)/GameApp/Packaging/app.manifest</ApplicationManifest>
+  </PropertyGroup>
+
   <!-- Publish: ship the game, not the developer files -->
   <PropertyGroup>
     <PublishDocumentationFile>false</PublishDocumentationFile>
