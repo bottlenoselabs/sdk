@@ -40,7 +40,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, macos-latest, ubuntu-latest]
+        # ubuntu-24.04, not ubuntu-latest: c2ffi only finds libclang from LLVM 10 to 18, and newer Ubuntu releases ship newer LLVM
+        os: [windows-latest, macos-latest, ubuntu-24.04]
     defaults:
       run:
         shell: bash
@@ -57,10 +58,11 @@ jobs:
         with:
           global-json-file: global.json
 
-      - name: "Install Linux Arm64 headers"
+      - name: "Install Linux dependencies"
         if: ${{ runner.os == 'Linux' }}
-        # The aarch64-unknown-linux-gnu target needs the Arm64 C library headers
-        run: sudo apt-get update && sudo apt-get install --yes --no-install-recommends gcc-aarch64-linux-gnu
+        # libclang for c2ffi (found at /usr/lib/llvm-18/lib/libclang.so.1), and the Arm64 C library headers for the
+        # aarch64-unknown-linux-gnu target
+        run: sudo apt-get update && sudo apt-get install --yes --no-install-recommends libclang1-18 gcc-aarch64-linux-gnu
 
       - name: "Extract"
         run: ./bindgen/SDL/bindgen.sh extract
